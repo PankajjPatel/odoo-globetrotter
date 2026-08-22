@@ -87,19 +87,24 @@ def test_all():
     print(f"Login with New Password Status: {status}")
     new_token = res.get("token")
 
-    print("\n--- 7. Testing Admin Analytics API (with root admin token) ---")
-    # Login root admin
+    print("\n--- 7. Testing Admin Analytics & Notifications API ---")
     status, admin_res = make_request("/auth/login/", method="POST", data={"email": "pankaj@globetrotter.com", "password": "adminpassword123"})
     if status == 200:
         admin_token = admin_res.get("token")
         status, stats_res = make_request("/admin/stats/", method="GET", token=admin_token)
-        print(f"Admin Stats Status: {status}, Users Count: {stats_res.get('stats', {}).get('total_users')}")
+        print(f"Admin Stats Status: {status}, Users: {stats_res.get('stats', {}).get('total_users')}, Daily Signups: {stats_res.get('stats', {}).get('daily_signups')}")
+
+        status, notif_res = make_request("/admin/notifications/", method="GET", token=admin_token)
+        print(f"Admin Notifications Status: {status}, Total Notifications: {len(notif_res.get('notifications', []))}")
+        if notif_res.get('notifications'):
+            latest = notif_res.get('notifications')[0]
+            print(f"Latest Notification: {latest.get('message')}")
 
     print("\n--- 8. Testing Delete Account API ---")
     status, res = make_request("/auth/delete-account/", method="DELETE", token=new_token)
     print(f"Delete Account Status: {status}, Msg: {res.get('message')}")
 
-    print("\nALL BACKEND API TESTS COMPLETED!")
+    print("\nALL BACKEND & NOTIFICATION API TESTS COMPLETED!")
 
 if __name__ == "__main__":
     test_all()
