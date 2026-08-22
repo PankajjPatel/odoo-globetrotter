@@ -30,15 +30,62 @@ import {
 import { useAuth } from '../context/AuthContext';
 import './AdminDashboardScreen.css';
 
+const DEFAULT_INITIAL_USERS = [
+  { id: 1, username: '_Pankaj_03', email: 'pankaj@globetrotter.com', full_name: 'Pankaj Admin', is_staff: true, is_superuser: true, is_active: true, date_joined: 'Aug 22, 2026', trips_count: 5 },
+  { id: 2, username: 'aarav_sharma', email: 'aarav.sharma@example.com', full_name: 'Aarav Sharma', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 22, 2026', trips_count: 3 },
+  { id: 3, username: 'diya_patel', email: 'diya.patel@example.com', full_name: 'Diya Patel', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 21, 2026', trips_count: 2 },
+  { id: 4, username: 'ananya_verma', email: 'ananya.v@example.com', full_name: 'Ananya Verma', is_staff: true, is_superuser: false, is_active: true, date_joined: 'Aug 20, 2026', trips_count: 4 },
+  { id: 5, username: 'rohan_mehta', email: 'rohan.mehta@example.com', full_name: 'Rohan Mehta', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 19, 2026', trips_count: 2 },
+  { id: 6, username: 'vikram_singh', email: 'vikram.singh@example.com', full_name: 'Vikram Singh', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 18, 2026', trips_count: 1 },
+  { id: 7, username: 'priya_nair', email: 'priya.nair@example.com', full_name: 'Priya Nair', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 17, 2026', trips_count: 3 },
+  { id: 8, username: 'kabir_joshi', email: 'kabir.j@example.com', full_name: 'Kabir Joshi', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 16, 2026', trips_count: 2 },
+  { id: 9, username: 'sneha_reddy', email: 'sneha.reddy@example.com', full_name: 'Sneha Reddy', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 15, 2026', trips_count: 1 },
+  { id: 10, username: 'arjun_kapoor', email: 'arjun.k@example.com', full_name: 'Arjun Kapoor', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 14, 2026', trips_count: 4 },
+  { id: 11, username: 'tanya_sen', email: 'tanya.sen@example.com', full_name: 'Tanya Sen', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 13, 2026', trips_count: 2 },
+  { id: 12, username: 'karan_malhotra', email: 'karan.m@example.com', full_name: 'Karan Malhotra', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 12, 2026', trips_count: 3 },
+  { id: 13, username: 'meera_iyer', email: 'meera.iyer@example.com', full_name: 'Meera Iyer', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 11, 2026', trips_count: 1 },
+  { id: 14, username: 'aditya_rao', email: 'aditya.rao@example.com', full_name: 'Aditya Rao', is_staff: false, is_superuser: false, is_active: false, date_joined: 'Aug 10, 2026', trips_count: 0 },
+  { id: 15, username: 'neha_gupta', email: 'neha.gupta@example.com', full_name: 'Neha Gupta', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 09, 2026', trips_count: 2 },
+  { id: 16, username: 'rahul_deshmukh', email: 'rahul.d@example.com', full_name: 'Rahul Deshmukh', is_staff: false, is_superuser: false, is_active: true, date_joined: 'Aug 08, 2026', trips_count: 3 },
+];
+
+const DEFAULT_INITIAL_STATS = {
+  total_users: 118,
+  total_trips: 67,
+  total_stops: 94,
+  total_activities: 33,
+  total_trip_activities: 48,
+  total_cities: 10
+};
+
+const DEFAULT_POPULAR_CITIES = [
+  { name: 'Goa', country: 'India', cost_index: '$$$', popularity: 'Very High' },
+  { name: 'Jaipur', country: 'India', cost_index: '$$', popularity: 'Very High' },
+  { name: 'Udaipur', country: 'India', cost_index: '$$$', popularity: 'High' },
+  { name: 'Agra', country: 'India', cost_index: '$$', popularity: 'Very High' },
+  { name: 'Delhi', country: 'India', cost_index: '$$', popularity: 'Very High' },
+  { name: 'Manali', country: 'India', cost_index: '$$', popularity: 'High' },
+  { name: 'Varanasi', country: 'India', cost_index: '$', popularity: 'High' },
+];
+
+const DEFAULT_GROWTH = [
+  { month: 'Mar', users: 18 },
+  { month: 'Apr', users: 34 },
+  { month: 'May', users: 52 },
+  { month: 'Jun', users: 76 },
+  { month: 'Jul', users: 95 },
+  { month: 'Aug', users: 118 },
+];
+
 export const AdminDashboardScreen = () => {
   const { token, user: currentUser } = useAuth();
   
-  const [stats, setStats] = useState(null);
-  const [userGrowth, setUserGrowth] = useState([]);
-  const [popularCities, setPopularCities] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [stats, setStats] = useState(DEFAULT_INITIAL_STATS);
+  const [userGrowth, setUserGrowth] = useState(DEFAULT_GROWTH);
+  const [popularCities, setPopularCities] = useState(DEFAULT_POPULAR_CITIES);
+  const [users, setUsers] = useState(DEFAULT_INITIAL_USERS);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);

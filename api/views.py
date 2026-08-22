@@ -232,8 +232,14 @@ class AdminUserListView(APIView):
             )
 
         data = []
-        for u in users_qs:
+        for u in users_qs[:30]:
             full_name = f"{u.first_name} {u.last_name}".strip() or u.username
+            trips_count = 0
+            if hasattr(u, 'user_trips'):
+                trips_count = u.user_trips.count()
+            elif hasattr(u, 'trip_set'):
+                trips_count = u.trip_set.count()
+
             data.append({
                 "id": u.id,
                 "username": u.username,
@@ -243,7 +249,7 @@ class AdminUserListView(APIView):
                 "is_superuser": u.is_superuser,
                 "is_active": u.is_active,
                 "date_joined": u.date_joined.strftime('%b %d, %Y') if u.date_joined else 'N/A',
-                "trips_count": u.trip_set.count() if hasattr(u, 'trip_set') else 0
+                "trips_count": trips_count
             })
 
         return Response({"users": data}, status=status.HTTP_200_OK)
