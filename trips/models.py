@@ -5,9 +5,10 @@ from django.contrib.auth.models import User
 
 class City(models.Model):
     name = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}, {self.country}"
 
 
 class Trip(models.Model):
@@ -28,8 +29,9 @@ class Trip(models.Model):
 class Stop(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="stops")
     city = models.ForeignKey(City, on_delete=models.CASCADE)
-    arrival_date = models.DateField()
-    departure_date = models.DateField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+    order = models.PositiveIntegerField()
 
 
 class Activity(models.Model):

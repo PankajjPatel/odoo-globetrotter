@@ -61,3 +61,29 @@ class TripDetailSerializer(serializers.ModelSerializer):
             'share_uuid',
         ]
 
+
+class CityMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['id', 'name', 'country']
+
+
+class StopSerializer(serializers.ModelSerializer):
+    city_detail = CityMiniSerializer(source="city", read_only=True)
+
+    class Meta:
+        model = Stop
+        fields = [
+            'id',
+            'trip',
+            'city',
+            'city_detail',
+            'start_date',
+            'end_date',
+            'order',
+        ]
+        extra_kwargs = {
+            'trip': {'write_only': True}
+        }
+
+

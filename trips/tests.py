@@ -7,7 +7,7 @@ from rest_framework import status
 from django.urls import reverse
 from datetime import date, timedelta
 from trips.serializers import TripListSerializer, TripCreateUpdateSerializer, TripDetailSerializer
-from trips.models import Trip
+from trips.models import Trip, City, Stop
 
 
 class TripSerializerTestCase(TestCase):
@@ -82,6 +82,7 @@ class TripAPIViewSetTestCase(APITestCase):
             end_date=date.today() + timedelta(days=3),
             is_public=True
         )
+        self.city1 = City.objects.create(name="Paris", country="France")
 
     def test_retrieve_own_trip(self):
         self.client.force_authenticate(user=self.user1)
@@ -136,3 +137,38 @@ class TripAPIViewSetTestCase(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Trip.objects.filter(pk=self.trip2.pk).exists())
+
+    def test_add_stop_success(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('add-stop', kwargs={'trip_id': self.trip1.id})
+        data = {
+            'city': self.city1.id,
+            'start_date': date.today().strftime('%Y-%m-%d'),
+            'end_date': (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'),
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['order'], 0)
+        self.assertEqual(response.data['city'], self.city1.id)
+        self.assertEqual(response.data['city_detail']['name'], "Paris")
+        self.assertEqual(response.data['city_detail']['country'], "France")
+
+        data2 = {
+            'city': self.city1.id,
+            'start_date': (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'),
+            'end_date': (date.today() + timedelta(days=2)).strftime('%Y-%m-%d'),
+        }
+        response2 = self.client.post(url, data2)
+        self.assertEqual(response2.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response2.data['order'], 1)
+
+    def test_add_stop_other_user_trip_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('add-stop', kwargs={'trip_id': self.trip2.id})
+        data = {
+            'city': self.city1.id,
+            'start_date': date.today().strftime('%Y-%m-%d'),
+            'end_date': (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'),
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
