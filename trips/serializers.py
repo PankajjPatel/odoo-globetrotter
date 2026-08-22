@@ -47,7 +47,64 @@ class TripCreateUpdateSerializer(serializers.ModelSerializer):
         return attrs
 
 
+# TripDetailSerializer moved to the end of the file to prevent NameError on StopSerializer
+
+
+class CityMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ['id', 'name', 'country']
+
+
+class ActivityMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ['id', 'name', 'type', 'cost', 'duration_hours']
+
+
+class TripActivitySerializer(serializers.ModelSerializer):
+    activity_detail = ActivityMiniSerializer(source="activity", read_only=True)
+
+    class Meta:
+        model = TripActivity
+        fields = [
+            'id',
+            'stop',
+            'activity',
+            'activity_detail',
+            'scheduled_time',
+            'cost_override',
+        ]
+        extra_kwargs = {
+            'stop': {'write_only': True}
+        }
+
+
+class StopSerializer(serializers.ModelSerializer):
+    city_detail = CityMiniSerializer(source="city", read_only=True)
+    activities = TripActivitySerializer(source="trip_activities", many=True, read_only=True)
+
+    class Meta:
+        model = Stop
+        fields = [
+            'id',
+            'trip',
+            'city',
+            'city_detail',
+            'start_date',
+            'end_date',
+            'order',
+            'activities',
+        ]
+        extra_kwargs = {
+            'trip': {'write_only': True}
+        }
+
+
+
 class TripDetailSerializer(serializers.ModelSerializer):
+    stops = StopSerializer(many=True, read_only=True)
+
     class Meta:
         model = Trip
         fields = [
@@ -59,5 +116,5 @@ class TripDetailSerializer(serializers.ModelSerializer):
             'cover_photo',
             'is_public',
             'share_uuid',
+            'stops',
         ]
-

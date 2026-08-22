@@ -7,7 +7,7 @@ from rest_framework import status
 from django.urls import reverse
 from datetime import date, timedelta
 from trips.serializers import TripListSerializer, TripCreateUpdateSerializer, TripDetailSerializer
-from trips.models import Trip
+from trips.models import Trip, City, Stop, Activity, TripActivity
 
 
 class TripSerializerTestCase(TestCase):
@@ -38,7 +38,7 @@ class TripSerializerTestCase(TestCase):
         )
         serializer = TripDetailSerializer(instance=trip)
         expected_fields = {
-            'id', 'name', 'description', 'start_date', 'end_date', 'cover_photo', 'is_public', 'share_uuid'
+            'id', 'name', 'description', 'start_date', 'end_date', 'cover_photo', 'is_public', 'share_uuid', 'stops'
         }
         self.assertEqual(set(serializer.data.keys()), expected_fields)
 
@@ -82,6 +82,13 @@ class TripAPIViewSetTestCase(APITestCase):
             end_date=date.today() + timedelta(days=3),
             is_public=True
         )
+        self.city1 = City.objects.create(name="Paris", country="France")
+        self.activity1 = Activity.objects.create(
+            name="Eiffel Tower Tour",
+            type="Sightseeing",
+            cost=15.00,
+            duration_hours=2
+        )
 
     def test_retrieve_own_trip(self):
         self.client.force_authenticate(user=self.user1)
@@ -89,7 +96,7 @@ class TripAPIViewSetTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_fields = {
-            'id', 'name', 'description', 'start_date', 'end_date', 'cover_photo', 'is_public', 'share_uuid'
+            'id', 'name', 'description', 'start_date', 'end_date', 'cover_photo', 'is_public', 'share_uuid', 'stops'
         }
         self.assertEqual(set(response.data.keys()), expected_fields)
 
@@ -136,3 +143,212 @@ class TripAPIViewSetTestCase(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Trip.objects.filter(pk=self.trip2.pk).exists())
+
+    def test_add_stop_success(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('add-stop', kwargs={'trip_id': self.trip1.id})
+        data = {
+            'city': self.city1.id,
+            'start_date': date.today().strftime('%Y-%m-%d'),
+            'end_date': (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'),
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['order'], 0)
+        self.assertEqual(response.data['city'], self.city1.id)
+        self.assertEqual(response.data['city_detail']['name'], "Paris")
+        self.assertEqual(response.data['city_detail']['country'], "France")
+
+        data2 = {
+            'city': self.city1.id,
+            'start_date': (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'),
+            'end_date': (date.today() + timedelta(days=2)).strftime('%Y-%m-%d'),
+        }
+        response2 = self.client.post(url, data2)
+        self.assertEqual(response2.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response2.data['order'], 1)
+
+    def test_add_stop_other_user_trip_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('add-stop', kwargs={'trip_id': self.trip2.id})
+        data = {
+            'city': self.city1.id,
+            'start_date': date.today().strftime('%Y-%m-%d'),
+            'end_date': (date.today() + timedelta(days=1)).strftime('%Y-%m-%d'),
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_reorder_stops_success(self):
+        self.client.force_authenticate(user=self.user1)
+        stop1 = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        stop2 = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=1
+        )
+        url = reverse('reorder-stops', kwargs={'trip_id': self.trip1.id})
+        data = {
+            'order': [stop2.id, stop1.id]
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        stop1.refresh_from_db()
+        stop2.refresh_from_db()
+        self.assertEqual(stop1.order, 1)
+        self.assertEqual(stop2.order, 0)
+
+    def test_reorder_stops_other_user_trip_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('reorder-stops', kwargs={'trip_id': self.trip2.id})
+        data = {
+            'order': []
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_stop_success(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        url = reverse('delete-stop', kwargs={'stop_id': stop.id})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Stop.objects.filter(id=stop.id).exists())
+
+    def test_delete_stop_other_user_stop_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip2,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        url = reverse('delete-stop', kwargs={'stop_id': stop.id})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(Stop.objects.filter(id=stop.id).exists())
+
+    def test_assign_activity_success(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        url = reverse('assign-activity', kwargs={'stop_id': stop.id})
+        data = {
+            'activity': self.activity1.id,
+            'scheduled_time': '10:00:00',
+            'cost_override': '12.50'
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['activity'], self.activity1.id)
+        self.assertEqual(response.data['cost_override'], '12.50')
+        self.assertEqual(response.data['activity_detail']['name'], "Eiffel Tower Tour")
+        self.assertEqual(response.data['activity_detail']['type'], "Sightseeing")
+
+    def test_assign_activity_other_user_stop_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip2,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        url = reverse('assign-activity', kwargs={'stop_id': stop.id})
+        data = {
+            'activity': self.activity1.id
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_assigned_activity_success(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        trip_activity = TripActivity.objects.create(
+            stop=stop,
+            activity=self.activity1,
+            cost_override=10.00
+        )
+        url = reverse('assign-activity', kwargs={'stop_id': stop.id}) + f"?trip_activity_id={trip_activity.id}"
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(TripActivity.objects.filter(id=trip_activity.id).exists())
+
+    def test_delete_assigned_activity_other_user_stop_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip2,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        trip_activity = TripActivity.objects.create(
+            stop=stop,
+            activity=self.activity1,
+            cost_override=10.00
+        )
+        url = reverse('assign-activity', kwargs={'stop_id': stop.id}) + f"?trip_activity_id={trip_activity.id}"
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(TripActivity.objects.filter(id=trip_activity.id).exists())
+
+    def test_itinerary_detail_success(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        trip_activity = TripActivity.objects.create(
+            stop=stop,
+            activity=self.activity1,
+            cost_override=12.50
+        )
+        url = reverse('itinerary-detail', kwargs={'trip_id': self.trip1.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], self.trip1.id)
+        self.assertEqual(response.data['name'], self.trip1.name)
+        self.assertEqual(len(response.data['stops']), 1)
+        self.assertEqual(response.data['stops'][0]['id'], stop.id)
+        self.assertEqual(response.data['stops'][0]['city_detail']['name'], "Paris")
+        self.assertEqual(len(response.data['stops'][0]['activities']), 1)
+        self.assertEqual(response.data['stops'][0]['activities'][0]['activity_detail']['name'], "Eiffel Tower Tour")
+
+    def test_itinerary_detail_other_user_trip_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('itinerary-detail', kwargs={'trip_id': self.trip2.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
