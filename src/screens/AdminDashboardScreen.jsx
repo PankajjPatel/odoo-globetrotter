@@ -195,6 +195,8 @@ export const AdminDashboardScreen = () => {
     }
   };
 
+  const [selectedUserDetail, setSelectedUserDetail] = useState(null);
+
   const statCards = [
     {
       title: 'Total Users',
@@ -209,8 +211,8 @@ export const AdminDashboardScreen = () => {
       value: stats ? stats.total_trips : '...',
       label: 'Custom itineraries',
       icon: Compass,
-      color: '#ff5722',
-      gradient: 'linear-gradient(135deg, #ff5722 0%, #d84315 100%)'
+      color: '#f97316',
+      gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
     },
     {
       title: 'Destinations & Stops',
@@ -299,8 +301,8 @@ export const AdminDashboardScreen = () => {
               <AreaChart data={userGrowth} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ff5722" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#ff5722" stopOpacity={0.0}/>
+                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#f97316" stopOpacity={0.0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -314,7 +316,7 @@ export const AdminDashboardScreen = () => {
                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
                   }} 
                 />
-                <Area type="monotone" dataKey="users" stroke="#ff5722" strokeWidth={3} fillOpacity={1} fill="url(#growthGrad)" />
+                <Area type="monotone" dataKey="users" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#growthGrad)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -357,7 +359,7 @@ export const AdminDashboardScreen = () => {
             <Database size={22} className="text-primary-brand" />
             <div>
               <h2>User Directory & Access Control</h2>
-              <p className="card-subtext">Manage accounts, toggle roles, and control authorizations.</p>
+              <p className="card-subtext">Click any user row or inspect details to view profile breakdown and trips.</p>
             </div>
           </div>
           <div className="search-bar-inline">
@@ -391,14 +393,18 @@ export const AdminDashboardScreen = () => {
                   const isSelf = u.id === currentUser?.id;
                   const isSuper = u.is_superuser;
                   return (
-                    <tr key={u.id} className={!u.is_active ? 'row-suspended' : ''}>
+                    <tr 
+                      key={u.id} 
+                      className={`clickable-table-row ${!u.is_active ? 'row-suspended' : ''}`}
+                      onClick={() => setSelectedUserDetail(u)}
+                    >
                       <td>
                         <div className="user-cell">
                           <div className="user-avatar-sm">
                             {u.full_name.charAt(0).toUpperCase() || u.username.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <div className="user-name-text">
+                            <div className="user-name-text user-name-link">
                               {u.full_name} {isSelf && <span className="self-tag">(You)</span>}
                             </div>
                             <div className="user-username-sub">@{u.username}</div>
@@ -416,7 +422,9 @@ export const AdminDashboardScreen = () => {
                         )}
                       </td>
                       <td>
-                        <span className="trips-count-pill">{u.trips_count} {u.trips_count === 1 ? 'trip' : 'trips'}</span>
+                        <span className="trips-count-pill clickable-pill" title="Click to inspect user trips">
+                          {u.trips_count} {u.trips_count === 1 ? 'trip' : 'trips'}
+                        </span>
                       </td>
                       <td className="date-cell">{u.date_joined}</td>
                       <td>
@@ -430,9 +438,19 @@ export const AdminDashboardScreen = () => {
                           </span>
                         )}
                       </td>
-                      <td className="text-right actions-cell">
-                        {!isSelf && (
-                          <div className="action-buttons-group">
+                      <td className="text-right actions-cell" onClick={(e) => e.stopPropagation()}>
+                        <div className="action-buttons-group">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="btn-action-inspect"
+                            onClick={() => setSelectedUserDetail(u)}
+                            title="View Full User Details"
+                          >
+                            Details
+                          </Button>
+
+                          {!isSelf && (
                             <Button 
                               variant="ghost" 
                               size="sm" 
@@ -444,35 +462,21 @@ export const AdminDashboardScreen = () => {
                               {u.is_active ? <XCircle size={15} /> : <CheckCircle2 size={15} />}
                               <span>{u.is_active ? 'Suspend' : 'Activate'}</span>
                             </Button>
+                          )}
 
-                            {!isSuper && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="btn-action-role"
-                                onClick={() => handleToggleRole(u)}
-                                disabled={actionLoading}
-                                title={u.is_staff ? "Demote from Admin" : "Promote to Admin"}
-                              >
-                                <Shield size={15} />
-                                <span>{u.is_staff ? 'Demote' : 'Make Admin'}</span>
-                              </Button>
-                            )}
-
-                            {!isSuper && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="btn-action-delete"
-                                onClick={() => setUserToDelete(u)}
-                                disabled={actionLoading}
-                                title="Delete User"
-                              >
-                                <Trash2 size={15} />
-                              </Button>
-                            )}
-                          </div>
-                        )}
+                          {!isSelf && !isSuper && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="btn-action-delete"
+                              onClick={() => setUserToDelete(u)}
+                              disabled={actionLoading}
+                              title="Delete User"
+                            >
+                              <Trash2 size={15} />
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -488,6 +492,106 @@ export const AdminDashboardScreen = () => {
           </table>
         </div>
       </Card>
+
+      {/* User Details & Trips Inspection Modal */}
+      {selectedUserDetail && (
+        <div className="admin-modal-overlay animate-fade-in" onClick={() => setSelectedUserDetail(null)}>
+          <div className="admin-modal-card user-detail-modal-card glass" onClick={(e) => e.stopPropagation()}>
+            <div className="user-modal-header">
+              <div className="user-modal-avatar">
+                {selectedUserDetail.full_name.charAt(0).toUpperCase() || selectedUserDetail.username.charAt(0).toUpperCase()}
+              </div>
+              <div className="user-modal-title-box">
+                <div className="flex-align-center gap-2">
+                  <h3>{selectedUserDetail.full_name}</h3>
+                  <span className={`status-indicator-pill ${selectedUserDetail.is_active ? 'active' : 'suspended'}`}>
+                    {selectedUserDetail.is_active ? 'Active Account' : 'Suspended'}
+                  </span>
+                </div>
+                <p className="user-modal-handle">@{selectedUserDetail.username} • User ID #{selectedUserDetail.id}</p>
+              </div>
+              <button className="modal-close-btn" onClick={() => setSelectedUserDetail(null)}>×</button>
+            </div>
+
+            <div className="user-modal-body">
+              <div className="user-details-info-grid">
+                <div className="info-item-card">
+                  <span className="info-item-label">Email Address</span>
+                  <span className="info-item-value">{selectedUserDetail.email}</span>
+                </div>
+                <div className="info-item-card">
+                  <span className="info-item-label">Platform Role</span>
+                  <span className="info-item-value">
+                    {selectedUserDetail.is_superuser ? 'Global Superuser' : selectedUserDetail.is_staff ? 'Staff Administrator' : 'Verified Traveler'}
+                  </span>
+                </div>
+                <div className="info-item-card">
+                  <span className="info-item-label">Member Since</span>
+                  <span className="info-item-value">{selectedUserDetail.date_joined}</span>
+                </div>
+                <div className="info-item-card">
+                  <span className="info-item-label">Created Itineraries</span>
+                  <span className="info-item-value highlight">{selectedUserDetail.trips_count} Planned Journeys</span>
+                </div>
+              </div>
+
+              <div className="user-trips-overview-section">
+                <h4>Travel Portfolio & Activity</h4>
+                <div className="user-trips-summary-box">
+                  <Compass size={22} className="text-primary-brand" />
+                  <div>
+                    <span className="summary-title">{selectedUserDetail.trips_count > 0 ? `${selectedUserDetail.trips_count} Active Trips Created` : 'No Trips Created Yet'}</span>
+                    <p className="summary-sub">
+                      {selectedUserDetail.trips_count > 0 
+                        ? 'User has customized itineraries stored in the central database.'
+                        : 'This explorer has not saved any customized travel plans yet.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Administrative Quick Actions Inside Modal */}
+              <div className="user-modal-admin-actions">
+                {selectedUserDetail.id !== currentUser?.id && (
+                  <Button 
+                    variant="outline" 
+                    className={selectedUserDetail.is_active ? 'btn-warn' : 'btn-activate'}
+                    onClick={() => {
+                      handleToggleStatus(selectedUserDetail);
+                      setSelectedUserDetail({ ...selectedUserDetail, is_active: !selectedUserDetail.is_active });
+                    }}
+                    disabled={actionLoading}
+                  >
+                    {selectedUserDetail.is_active ? <XCircle size={16} className="mr-2" /> : <CheckCircle2 size={16} className="mr-2" />}
+                    {selectedUserDetail.is_active ? 'Suspend User Access' : 'Activate User Access'}
+                  </Button>
+                )}
+
+                {selectedUserDetail.id !== currentUser?.id && !selectedUserDetail.is_superuser && (
+                  <Button 
+                    variant="ghost" 
+                    className="btn-delete-modal-action"
+                    onClick={() => {
+                      const u = selectedUserDetail;
+                      setSelectedUserDetail(null);
+                      setUserToDelete(u);
+                    }}
+                    disabled={actionLoading}
+                  >
+                    <Trash2 size={16} className="mr-2 text-danger" /> Delete Account
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div className="modal-footer-row">
+              <Button variant="primary" onClick={() => setSelectedUserDetail(null)}>
+                Close Details
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Deletion Confirmation Modal */}
       {userToDelete && (
