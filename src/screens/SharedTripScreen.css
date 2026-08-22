@@ -1,0 +1,120 @@
+.shared-trip-container {
+  padding-bottom: var(--spacing-xl);
+}
+
+.shared-banner {
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  margin-bottom: var(--spacing-xl);
+}
+
+.shared-banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 100%);
+  display: flex;
+  align-items: center;
+}
+
+.shared-banner-overlay .container {
+  color: white;
+}
+
+.shared-badge {
+  display: inline-block;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: var(--spacing-sm);
+}
+
+.shared-banner-overlay h1 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.meta-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.bullet {
+  font-size: 1.2rem;
+}
+
+.shared-content {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: var(--spacing-xl);
+}
+
+@media (max-width: 768px) {
+  .shared-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.shared-main h2 {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-xl);
+  color: var(--secondary-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--spacing-sm);
+}
+
+/* Timeline styles reused from ItineraryView */
+.shared-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.read-only {
+  background-color: var(--bg-surface);
+  border-color: var(--border-color) !important;
+}
+.read-only:hover {
+  border-color: var(--border-color) !important;
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: var(--spacing-lg) 0;
+}
+
+.social-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.public-url-box {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.25rem 0.25rem 0.25rem 0.75rem;
+}
+
+.url-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
