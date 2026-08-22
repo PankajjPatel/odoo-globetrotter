@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import City
+from .models import City, Activity
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -22,3 +22,30 @@ class CitySerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+    city_name = serializers.CharField(source='city.name', read_only=True)
+    city_country = serializers.CharField(source='city.country', read_only=True)
+    category = serializers.CharField(source='type', read_only=True)
+    image_url = serializers.CharField(source='image', read_only=True)
+
+    class Meta:
+        model = Activity
+        fields = [
+            'id',
+            'name',
+            'city',
+            'city_name',
+            'city_country',
+            'type',
+            'category',
+            'cost',
+            'duration',
+            'description',
+            'image',
+            'image_url',
+            'created_at',
+            'updated_at'
+        ]
+

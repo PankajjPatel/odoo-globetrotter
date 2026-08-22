@@ -11,6 +11,7 @@ from .views import (
     SharedTripDetailView,
     CopySharedTripView,
 )
+from .budget_views import TripBudgetView
 
 router = DefaultRouter()
 router.register(r"trips", TripViewSet, basename="trip")
@@ -24,6 +25,9 @@ urlpatterns = [
     path("trips/<int:trip_id>/share/", ShareTripView.as_view(), name="share-trip"),
     path("trips/shared/<uuid:share_uuid>/", SharedTripDetailView.as_view(), name="shared-trip-detail"),
     path("trips/shared/<uuid:share_uuid>/copy/", CopySharedTripView.as_view(), name="copy-shared-trip"),
+    path("trips/<int:trip_id>/budget/", TripBudgetView.as_view(), name="trip-budget"),
+    path("budget/trip/<int:trip_id>/", TripBudgetView.as_view(), name="trip-budget-alias"),
 ]
 urlpatterns += router.urls
+
 

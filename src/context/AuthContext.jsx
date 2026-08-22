@@ -68,13 +68,19 @@ export const AuthProvider = ({ children }) => {
     }
 
     if (!res.ok) {
-      let errorMessage = data.message || 'Signup failed';
-      if (data.errors) {
+      if (res.status >= 500 || !data || Object.keys(data).length === 0) {
+        throw new Error('Unable to connect to the backend server. Please make sure Django server is running.');
+      }
+      let errorMessage = '';
+      if (data.errors && typeof data.errors === 'object') {
         const errorEntries = Object.entries(data.errors);
         if (errorEntries.length > 0) {
           const [field, msgs] = errorEntries[0];
-          errorMessage = Array.isArray(msgs) ? msgs[0] : msgs;
+          errorMessage = Array.isArray(msgs) ? msgs[0] : String(msgs);
         }
+      }
+      if (!errorMessage) {
+        errorMessage = data.message || 'Signup failed';
       }
       throw new Error(errorMessage);
     }
@@ -104,13 +110,19 @@ export const AuthProvider = ({ children }) => {
     }
 
     if (!res.ok) {
-      let errorMessage = data.message || 'Invalid email or password';
-      if (data.errors) {
+      if (res.status >= 500 || !data || Object.keys(data).length === 0) {
+        throw new Error('Unable to connect to the backend server. Please make sure Django server is running.');
+      }
+      let errorMessage = '';
+      if (data.errors && typeof data.errors === 'object') {
         const errorEntries = Object.entries(data.errors);
         if (errorEntries.length > 0) {
           const [field, msgs] = errorEntries[0];
-          errorMessage = Array.isArray(msgs) ? msgs[0] : msgs;
+          errorMessage = Array.isArray(msgs) ? msgs[0] : String(msgs);
         }
+      }
+      if (!errorMessage) {
+        errorMessage = data.message || 'Invalid email or password';
       }
       throw new Error(errorMessage);
     }
@@ -144,13 +156,19 @@ export const AuthProvider = ({ children }) => {
     }
 
     if (!res.ok) {
-      let errorMessage = data.message || 'Password reset failed';
-      if (data.errors) {
+      if (res.status >= 500 || !data || Object.keys(data).length === 0) {
+        throw new Error('Unable to connect to the backend server. Please make sure Django server is running.');
+      }
+      let errorMessage = '';
+      if (data.errors && typeof data.errors === 'object') {
         const errorEntries = Object.entries(data.errors);
         if (errorEntries.length > 0) {
           const [field, msgs] = errorEntries[0];
-          errorMessage = Array.isArray(msgs) ? msgs[0] : msgs;
+          errorMessage = Array.isArray(msgs) ? msgs[0] : String(msgs);
         }
+      }
+      if (!errorMessage) {
+        errorMessage = data.message || 'Password reset failed';
       }
       throw new Error(errorMessage);
     }

@@ -16,8 +16,14 @@ class SignupView(APIView):
     def post(self, request):
         serializer = SignupSerializer(data=request.data)
         if not serializer.is_valid():
+            error_msg = serializer.errors.get('non_field_errors', [None])[0]
+            if not error_msg and serializer.errors:
+                first_key = list(serializer.errors.keys())[0]
+                first_err = serializer.errors[first_key]
+                first_err_str = first_err[0] if isinstance(first_err, list) else str(first_err)
+                error_msg = first_err_str
             return Response(
-                {"errors": serializer.errors, "message": "Signup validation failed."},
+                {"errors": serializer.errors, "message": error_msg or "Signup validation failed."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         

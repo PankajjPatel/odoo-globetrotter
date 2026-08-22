@@ -212,7 +212,7 @@ CITIES_DATA = [
                 'type': 'Sightseeing',
                 'cost': 0.00,
                 'duration': '2 hours',
-                'description': 'Scenic 3.6 km long promenade along the coast, famously known as the Queen’s Necklace.',
+                'description': "Scenic 3.6 km long promenade along the coast, famously known as the Queen's Necklace.",
                 'image': 'bg-marine-drive'
             },
             {
@@ -399,6 +399,302 @@ CITIES_DATA = [
                 'image': 'bg-sarnath'
             }
         ]
+    },
+    {
+        'name': 'Paris',
+        'country': 'France',
+        'region': 'Europe',
+        'cost_index': '$$$$',
+        'popularity': 'Very High',
+        'description': 'The romantic capital of France, globally famed for art, fashion, gastronomy, and culture.',
+        'image': 'bg-paris',
+        'activities': [
+            {
+                'name': 'Eiffel Tower Summit',
+                'type': 'Sightseeing',
+                'cost': 2500.00,
+                'duration': '3 hours',
+                'description': 'Ascend the iconic lattice tower for breathtaking panoramic views across Paris.',
+                'image': 'bg-eiffel-tower'
+            },
+            {
+                'name': 'Louvre Museum Tour',
+                'type': 'Culture',
+                'cost': 1800.00,
+                'duration': '4 hours',
+                'description': 'World’s largest art museum housing iconic masterpieces including Mona Lisa.',
+                'image': 'bg-louvre'
+            },
+            {
+                'name': 'Seine River Dinner Cruise',
+                'type': 'Food & Drink',
+                'cost': 4500.00,
+                'duration': '2.5 hours',
+                'description': 'Gourmet French dinner cruise past illuminated Parisian monuments along the Seine.',
+                'image': 'bg-seine-cruise'
+            },
+            {
+                'name': 'Palace of Versailles Excursion',
+                'type': 'History',
+                'cost': 2200.00,
+                'duration': '5 hours',
+                'description': 'Opulent former royal residence of King Louis XIV featuring the Hall of Mirrors.',
+                'image': 'bg-versailles'
+            }
+        ]
+    },
+    {
+        'name': 'Bali',
+        'country': 'Indonesia',
+        'region': 'Asia',
+        'cost_index': '$$',
+        'popularity': 'Very High',
+        'description': 'Tropical Indonesian island paradise known for volcanic mountains, iconic rice paddies, and beaches.',
+        'image': 'bg-bali',
+        'activities': [
+            {
+                'name': 'Tegallalang Rice Terrace Visit',
+                'type': 'Sightseeing',
+                'cost': 200.00,
+                'duration': '2 hours',
+                'description': 'Famous terraced hillside landscapes and traditional Balinese irrigation in Ubud.',
+                'image': 'bg-tegallalang'
+            },
+            {
+                'name': 'Uluwatu Sunset Temple & Kecak Dance',
+                'type': 'Culture',
+                'cost': 800.00,
+                'duration': '3 hours',
+                'description': 'Clifftop sea temple offering dramatic sunset views and live traditional Kecak fire dance.',
+                'image': 'bg-uluwatu'
+            },
+            {
+                'name': 'Mount Batur Sunrise Trek',
+                'type': 'Adventure',
+                'cost': 2500.00,
+                'duration': '6 hours',
+                'description': 'Guided early-morning volcano hike reaching the peak in time for a stunning sunrise view.',
+                'image': 'bg-mount-batur'
+            },
+            {
+                'name': 'Nusa Penida Island Tour',
+                'type': 'Adventure',
+                'cost': 3500.00,
+                'duration': '8 hours',
+                'description': 'Day trip visiting Kelingking Beach T-Rex cliff and snorkeling with manta rays.',
+                'image': 'bg-nusa-penida'
+            }
+        ]
+    },
+    {
+        'name': 'Tokyo',
+        'country': 'Japan',
+        'region': 'Asia',
+        'cost_index': '$$$$',
+        'popularity': 'Very High',
+        'description': 'Japan’s ultra-modern capital combining neon skyscrapers with historic temples.',
+        'image': 'bg-tokyo',
+        'activities': [
+            {
+                'name': 'Senso-ji Temple Stroll',
+                'type': 'Culture',
+                'cost': 0.00,
+                'duration': '2 hours',
+                'description': 'Tokyo’s oldest and most significant Buddhist temple located in Asakusa.',
+                'image': 'bg-sensoji'
+            },
+            {
+                'name': 'Shibuya Crossing & Sky Deck',
+                'type': 'Sightseeing',
+                'cost': 1200.00,
+                'duration': '2 hours',
+                'description': 'Experience the world’s busiest pedestrian intersection and observation deck.',
+                'image': 'bg-shibuya'
+            },
+            {
+                'name': 'Tsukiji Outer Market Food Tour',
+                'type': 'Food & Drink',
+                'cost': 2800.00,
+                'duration': '3 hours',
+                'description': 'Sample fresh sushi, wagyu beef skewers, and authentic Japanese street foods.',
+                'image': 'bg-tsukiji'
+            }
+        ]
+    },
+    {
+        'name': 'Dubai',
+        'country': 'UAE',
+        'region': 'Middle East',
+        'cost_index': '$$$$',
+        'popularity': 'Very High',
+        'description': 'Luxury desert metropolis famous for futuristic architecture, shopping malls, and nightlife.',
+        'image': 'bg-dubai',
+        'activities': [
+            {
+                'name': 'Burj Khalifa Observation Deck',
+                'type': 'Sightseeing',
+                'cost': 3800.00,
+                'duration': '2.5 hours',
+                'description': 'Visit the 124th and 125th floors of the world’s tallest skyscraper.',
+                'image': 'bg-burj-khalifa'
+            },
+            {
+                'name': 'Desert Safari & BBQ Dinner',
+                'type': 'Adventure',
+                'cost': 3000.00,
+                'duration': '6 hours',
+                'description': 'Thrilling dune bashing, camel riding, sandboarding, and Bedouin camp dinner.',
+                'image': 'bg-desert-safari'
+            },
+            {
+                'name': 'Dubai Mall & Fountain Show',
+                'type': 'Shopping',
+                'cost': 0.00,
+                'duration': '3 hours',
+                'description': 'World’s largest shopping mall with spectacular dancing fountain shows.',
+                'image': 'bg-dubai-mall'
+            }
+        ]
+    },
+    {
+        'name': 'Rome',
+        'country': 'Italy',
+        'region': 'Europe',
+        'cost_index': '$$$',
+        'popularity': 'High',
+        'description': 'The Eternal City packed with nearly 3,000 years of globally influential art, architecture, and history.',
+        'image': 'bg-rome',
+        'activities': [
+            {
+                'name': 'Colosseum & Roman Forum Tour',
+                'type': 'History',
+                'cost': 2200.00,
+                'duration': '3.5 hours',
+                'description': 'Walk through the ancient gladiatorial arena and center of the Roman Empire.',
+                'image': 'bg-colosseum'
+            },
+            {
+                'name': 'Vatican Museums & Sistine Chapel',
+                'type': 'Culture',
+                'cost': 2600.00,
+                'duration': '4 hours',
+                'description': 'Explore papal art collections and Michelangelo’s famous ceiling frescoes.',
+                'image': 'bg-vatican'
+            },
+            {
+                'name': 'Trevi Fountain & Gelato Walking Tour',
+                'type': 'Food & Drink',
+                'cost': 800.00,
+                'duration': '2 hours',
+                'description': 'Toss a coin in Trevi Fountain and sample handmade Italian gelato in Piazza Navona.',
+                'image': 'bg-trevi'
+            }
+        ]
+    },
+    {
+        'name': 'Singapore',
+        'country': 'Singapore',
+        'region': 'Asia',
+        'cost_index': '$$$$',
+        'popularity': 'Very High',
+        'description': 'Global financial city-state famous for futuristic gardens, cleanliness, and diverse cuisine.',
+        'image': 'bg-singapore',
+        'activities': [
+            {
+                'name': 'Gardens by the Bay & Supertrees',
+                'type': 'Sightseeing',
+                'cost': 1600.00,
+                'duration': '3 hours',
+                'description': 'Explore Flower Dome, Cloud Forest waterfall, and light show at Supertree Grove.',
+                'image': 'bg-gardens-bay'
+            },
+            {
+                'name': 'Marina Bay Sands Skypark',
+                'type': 'Sightseeing',
+                'cost': 1800.00,
+                'duration': '2 hours',
+                'description': 'Observation deck offering panoramic views of Singapore skyline and port.',
+                'image': 'bg-marina-bay'
+            },
+            {
+                'name': 'Sentosa Island Cable Car & Beach',
+                'type': 'Adventure',
+                'cost': 2200.00,
+                'duration': '5 hours',
+                'description': 'Scenic cable car ride to resort island featuring beaches and attractions.',
+                'image': 'bg-sentosa'
+            }
+        ]
+    },
+    {
+        'name': 'London',
+        'country': 'UK',
+        'region': 'Europe',
+        'cost_index': '$$$$',
+        'popularity': 'High',
+        'description': 'Capital of the UK blending royal history, world-class theatre, and iconic landmarks.',
+        'image': 'bg-london',
+        'activities': [
+            {
+                'name': 'Tower of London & Crown Jewels',
+                'type': 'History',
+                'cost': 3200.00,
+                'duration': '3 hours',
+                'description': 'Historic castle fortress on the Thames showcasing Britain’s royal treasures.',
+                'image': 'bg-tower-london'
+            },
+            {
+                'name': 'London Eye Flight',
+                'type': 'Sightseeing',
+                'cost': 3500.00,
+                'duration': '1.5 hours',
+                'description': 'Giant cantilevered observation wheel providing 360-degree views of Big Ben and Parliament.',
+                'image': 'bg-london-eye'
+            },
+            {
+                'name': 'West End Musical Show',
+                'type': 'Culture',
+                'cost': 4500.00,
+                'duration': '3 hours',
+                'description': 'Attend world-renowned theatrical performances in London’s West End theatre district.',
+                'image': 'bg-west-end'
+            }
+        ]
+    },
+    {
+        'name': 'New York',
+        'country': 'USA',
+        'region': 'North America',
+        'cost_index': '$$$$$',
+        'popularity': 'High',
+        'description': 'The Big Apple, a global center of culture, finance, media, and iconic skyscrapers.',
+        'image': 'bg-new-york',
+        'activities': [
+            {
+                'name': 'Statue of Liberty Ferry Tour',
+                'type': 'Sightseeing',
+                'cost': 2200.00,
+                'duration': '4 hours',
+                'description': 'Ferry to Liberty Island and Ellis Island immigration museum.',
+                'image': 'bg-statue-liberty'
+            },
+            {
+                'name': 'Central Park Bicycle Ride',
+                'type': 'Adventure',
+                'cost': 1500.00,
+                'duration': '2.5 hours',
+                'description': 'Explore 843 acres of green parkland, bridges, and lakes in Manhattan.',
+                'image': 'bg-central-park'
+            },
+            {
+                'name': 'Empire State Building Observatory',
+                'type': 'Sightseeing',
+                'cost': 3800.00,
+                'duration': '2 hours',
+                'description': '86th floor open-air observation deck overlooking NYC skyline.',
+                'image': 'bg-empire-state'
+            }
+        ]
     }
 ]
 
@@ -443,7 +739,35 @@ def seed_database():
                 activity.save()
                 print(f"      [~] Existing Activity updated: {activity.name}")
 
-    # Also seed api.models.City if api app is present
+    # Synchronize with trips app models (trips.models.City and trips.models.Activity)
+    try:
+        from trips.models import City as TripCity, Activity as TripActivityModel
+        for item in CITIES_DATA:
+            t_city, _ = TripCity.objects.get_or_create(
+                name=item['name'],
+                defaults={'country': item['country']}
+            )
+            for act_info in item.get('activities', []):
+                # parse numeric duration if needed
+                dur_hours = 2
+                try:
+                    dur_str = act_info.get('duration', '2')
+                    dur_hours = int(float(dur_str.split()[0]))
+                except Exception:
+                    dur_hours = 2
+
+                TripActivityModel.objects.get_or_create(
+                    name=act_info['name'],
+                    defaults={
+                        'type': act_info.get('type', 'Sightseeing'),
+                        'cost': act_info.get('cost', 0.00),
+                        'duration_hours': dur_hours
+                    }
+                )
+    except Exception as e:
+        print(f"  [-] Warning syncing trips models: {e}")
+
+    # Synchronize with api.models.City if api app is present
     try:
         from api.models import City as ApiCity
         for item in CITIES_DATA:
@@ -475,3 +799,4 @@ def seed_database():
 
 if __name__ == '__main__':
     seed_database()
+
