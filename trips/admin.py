@@ -9,9 +9,9 @@ class TripAdmin(admin.ModelAdmin):
 
 @admin.register(Stop)
 class StopAdmin(admin.ModelAdmin):
-    list_display = ('trip', 'city', 'arrival_date', 'departure_date')
+    list_display = ('trip', 'city', 'start_date', 'end_date', 'order')
     list_filter = ('city',)
 
 @admin.register(TripActivity)
 class TripActivityAdmin(admin.ModelAdmin):
-    list_display = ('trip', 'activity')
+    list_display = ('stop', 'activity', 'scheduled_time')
