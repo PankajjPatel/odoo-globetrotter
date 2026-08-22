@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
-import { Compass } from 'lucide-react';
+import { UserCircle } from 'lucide-react';
 import './LoginScreen.css';
 
 export const LoginScreen = () => {
@@ -12,43 +12,67 @@ export const LoginScreen = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Dummy authentication
     navigate('/dashboard');
   };
 
   return (
     <div className="login-container">
       <div className="login-background"></div>
-      <div className="login-content animate-fade-in">
+      
+      <div className={`login-content animate-fade-in ${isSignup ? 'signup-mode' : ''}`}>
         <Card className="login-card glass">
           <div className="login-header">
-            <Compass size={48} className="login-logo" />
-            <h1>GlobeTrotter</h1>
-            <p>{isSignup ? 'Create your account to start planning.' : 'Welcome back! Plan your next adventure.'}</p>
+            <div className="photo-placeholder">
+              <UserCircle size={64} className="text-secondary" />
+            </div>
+            <h2>{isSignup ? 'Registration' : 'Login'}</h2>
           </div>
           
           <form onSubmit={handleSubmit} className="login-form">
-            {isSignup && (
-              <Input label="Full Name" id="name" type="text" placeholder="John Doe" required />
-            )}
-            <Input label="Email Address" id="email" type="email" placeholder="you@example.com" required />
-            <Input label="Password" id="password" type="password" placeholder="••••••••" required />
-            
-            {!isSignup && (
-              <div className="login-options">
-                <a href="#" className="forgot-password">Forgot Password?</a>
+            {!isSignup ? (
+              // Login Form
+              <div className="form-group">
+                <Input label="Username" id="username" type="text" placeholder="Enter username" required />
+                <Input label="Password" id="password" type="password" placeholder="Enter password" required />
+                <div className="submit-container">
+                  <Button type="submit" variant="primary" size="lg">Login Button</Button>
+                </div>
+              </div>
+            ) : (
+              // Registration Form
+              <div className="form-group">
+                <div className="form-grid">
+                  <Input label="First Name" id="firstName" type="text" placeholder="First Name" required />
+                  <Input label="Last Name" id="lastName" type="text" placeholder="Last Name" required />
+                  
+                  <Input label="Email Address" id="email" type="email" placeholder="Email Address" required />
+                  <Input label="Phone Number" id="phone" type="tel" placeholder="Phone Number" required />
+                  
+                  <Input label="City" id="city" type="text" placeholder="City" required />
+                  <Input label="Country" id="country" type="text" placeholder="Country" required />
+                </div>
+                
+                <div className="input-group">
+                  <label htmlFor="additionalInfo" className="input-label">Additional Information</label>
+                  <textarea 
+                    id="additionalInfo" 
+                    className="input-field textarea-field" 
+                    placeholder="Additional Information ...."
+                    rows="4"
+                  ></textarea>
+                </div>
+
+                <div className="submit-container">
+                  <Button type="submit" variant="primary" size="lg">Register Users</Button>
+                </div>
               </div>
             )}
-            
-            <Button type="submit" variant="primary" size="lg" className="w-full mt-4">
-              {isSignup ? 'Sign Up' : 'Log In'}
-            </Button>
           </form>
 
           <div className="login-footer">
             <p>
               {isSignup ? 'Already have an account?' : "Don't have an account?"}
-              <button className="btn-ghost toggle-auth-btn" onClick={() => setIsSignup(!isSignup)}>
+              <button type="button" className="btn-ghost toggle-auth-btn" onClick={() => setIsSignup(!isSignup)}>
                 {isSignup ? 'Log In' : 'Sign Up'}
               </button>
             </p>

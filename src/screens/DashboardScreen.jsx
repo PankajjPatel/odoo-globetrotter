@@ -1,116 +1,92 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '../components/Card';
+import { Input } from '../components/Input';
 import { Button } from '../components/Button';
-import { MapPin, Calendar, Compass, TrendingUp, DollarSign } from 'lucide-react';
+import { MapPin, Calendar, Plus, Search, Filter, SlidersHorizontal, DollarSign } from 'lucide-react';
 import './DashboardScreen.css';
 
 export const DashboardScreen = () => {
   // Dummy data
   const upcomingTrips = [
-    { id: 1, name: 'Summer in Europe', dates: 'Jun 15 - Jun 30, 2026', destCount: 4, cover: 'bg-europe' },
-    { id: 2, name: 'Tokyo Adventure', dates: 'Oct 5 - Oct 15, 2026', destCount: 1, cover: 'bg-tokyo' },
+    { id: 1, name: 'Summer in Europe', dates: 'Jun 15 - Jun 30', cover: 'bg-europe' },
+    { id: 2, name: 'Tokyo Adventure', dates: 'Oct 5 - Oct 15', cover: 'bg-tokyo' },
+    { id: 3, name: 'New York Weekend', dates: 'Dec 1 - Dec 4', cover: 'bg-ny' },
   ];
 
-  const popularDestinations = [
-    { name: 'Bali, Indonesia', image: 'bg-bali' },
-    { name: 'Rome, Italy', image: 'bg-rome' },
-    { name: 'Kyoto, Japan', image: 'bg-kyoto' },
+  const regionalSelections = [
+    { name: 'Bali', image: 'bg-bali' },
+    { name: 'Rome', image: 'bg-rome' },
+    { name: 'Kyoto', image: 'bg-kyoto' },
+    { name: 'Paris', image: 'bg-paris' },
+    { name: 'Cairo', image: 'bg-cairo' },
   ];
 
   return (
-    <div className="dashboard-container container animate-fade-in">
-      <div className="dashboard-header">
-        <div>
+    <div className="dashboard-wrapper animate-fade-in">
+      {/* Banner Section */}
+      <div className="dashboard-banner">
+        <div className="banner-content">
           <h1>Welcome back, Explorer! 👋</h1>
-          <p className="text-secondary">Ready for your next adventure?</p>
+          <p>Ready for your next adventure?</p>
+          
+          {/* Budget Highlights inside banner to satisfy requirements */}
+          <div className="budget-highlight-pill">
+            <DollarSign size={16} /> 'Summer in Europe' is 10% under budget!
+          </div>
         </div>
-        <Link to="/create-trip">
-          <Button variant="primary" size="lg">
-            <Compass size={20} className="mr-2" /> Plan New Trip
-          </Button>
-        </Link>
       </div>
 
-      <div className="dashboard-grid">
-        <div className="dashboard-main">
-          <section className="upcoming-section">
-            <div className="section-header">
-              <h2>Upcoming Trips</h2>
-              <Link to="/my-trips" className="view-all">View All</Link>
-            </div>
-            
-            {upcomingTrips.length > 0 ? (
-              <div className="trip-cards-list">
-                {upcomingTrips.map(trip => (
-                  <Link to={`/trip/${trip.id}/builder`} key={trip.id}>
-                    <Card className="trip-card hoverable" hoverable>
-                      <div className={`trip-cover ${trip.cover}`}></div>
-                      <div className="trip-info">
-                        <h3>{trip.name}</h3>
-                        <div className="trip-meta">
-                          <span><Calendar size={14}/> {trip.dates}</span>
-                          <span><MapPin size={14}/> {trip.destCount} Destinations</span>
-                        </div>
-                      </div>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <Card className="empty-state">
-                <Compass size={48} className="text-muted mb-4" />
-                <h3>No upcoming trips</h3>
-                <p>Start planning your next dream vacation.</p>
-                <Link to="/create-trip">
-                  <Button variant="outline" className="mt-4">Create a Trip</Button>
-                </Link>
-              </Card>
-            )}
-          </section>
+      <div className="dashboard-container container">
+        {/* Search and Filters Bar */}
+        <div className="search-filter-bar">
+          <div className="search-input-wrapper">
+            <Search size={18} className="search-icon" />
+            <input type="text" placeholder="Search bar ...." className="search-input" />
+          </div>
+          <div className="filter-actions">
+            <Button variant="outline" size="sm" className="action-btn">Group by</Button>
+            <Button variant="outline" size="sm" className="action-btn"><Filter size={14} className="mr-1"/> Filter</Button>
+            <Button variant="outline" size="sm" className="action-btn"><SlidersHorizontal size={14} className="mr-1"/> Sort by...</Button>
+          </div>
+        </div>
 
-          <section className="inspiration-section">
-            <h2>Recommended Destinations</h2>
-            <div className="destinations-grid">
-              {popularDestinations.map((dest, i) => (
-                <div key={i} className={`dest-card ${dest.image}`}>
-                  <div className="dest-overlay">
-                    <h4>{dest.name}</h4>
-                  </div>
+        {/* Top Regional Selections */}
+        <section className="dashboard-section">
+          <h2 className="section-title">Top Regional Selections</h2>
+          <div className="regional-grid">
+            {regionalSelections.map((dest, i) => (
+              <div key={i} className={`regional-card ${dest.image}`}>
+                <div className="regional-overlay">
+                  <span>{dest.name}</span>
                 </div>
-              ))}
-            </div>
-          </section>
-        </div>
-
-        <div className="dashboard-sidebar">
-          <Card className="stats-card glass">
-            <h3>Quick Stats</h3>
-            <div className="stat-item">
-              <div className="stat-icon bg-blue-light"><MapPin size={20} className="text-blue" /></div>
-              <div className="stat-details">
-                <span className="stat-value">12</span>
-                <span className="stat-label">Cities Visited</span>
               </div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-icon bg-green-light"><TrendingUp size={20} className="text-green" /></div>
-              <div className="stat-details">
-                <span className="stat-value">5</span>
-                <span className="stat-label">Trips Completed</span>
-              </div>
-            </div>
-          </Card>
+            ))}
+          </div>
+        </section>
 
-          <Card className="budget-alert-card bg-gradient">
-            <div className="alert-content">
-              <h3><DollarSign size={20} /> Budget Update</h3>
-              <p>Your upcoming 'Summer in Europe' trip is 10% under budget!</p>
-              <Link to="/trip/1/budget" className="btn-link">View Breakdown &rarr;</Link>
-            </div>
-          </Card>
-        </div>
+        {/* Previous Trips (Upcoming/Recent) */}
+        <section className="dashboard-section">
+          <h2 className="section-title">Previous Trips</h2>
+          <div className="trips-grid-tall">
+            {upcomingTrips.map(trip => (
+              <Link to={`/trip/${trip.id}/builder`} key={trip.id} className="trip-link">
+                <Card className={`trip-card-tall ${trip.cover} hoverable`}>
+                  <div className="trip-card-tall-overlay">
+                    <h3>{trip.name}</h3>
+                    <p><Calendar size={14}/> {trip.dates}</p>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
+
+      {/* Floating Action Button */}
+      <Link to="/create-trip" className="fab-button">
+        <Plus size={24} /> <span>Plan a trip</span>
+      </Link>
     </div>
   );
 };

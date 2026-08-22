@@ -5,6 +5,7 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
+  padding: var(--spacing-md);
 }
 
 .login-background {
@@ -23,7 +24,11 @@
   z-index: 2;
   width: 100%;
   max-width: 440px;
-  padding: var(--spacing-md);
+  transition: max-width 0.3s ease;
+}
+
+.login-content.signup-mode {
+  max-width: 650px;
 }
 
 .login-card {
@@ -36,48 +41,52 @@
   margin-bottom: var(--spacing-xl);
 }
 
-.login-logo {
-  color: var(--primary-color);
-  margin-bottom: var(--spacing-sm);
+.photo-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: var(--bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--spacing-md);
+  border: 2px solid var(--border-color);
 }
 
-.login-header h1 {
-  font-size: 2rem;
+.login-header h2 {
+  font-size: 1.5rem;
   color: var(--secondary-color);
-  margin-bottom: var(--spacing-xs);
-}
-
-.login-header p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
+  margin-bottom: 0;
 }
 
 .login-form {
   margin-bottom: var(--spacing-lg);
 }
 
-.w-full {
-  width: 100%;
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
 }
 
-.mt-4 {
-  margin-top: 1rem;
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .login-content.signup-mode {
+    max-width: 100%;
+  }
 }
 
-.login-options {
+.textarea-field {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.submit-container {
   display: flex;
-  justify-content: flex-end;
-  margin-top: -0.5rem;
-  margin-bottom: 1rem;
-}
-
-.forgot-password {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-.forgot-password:hover {
-  color: var(--primary-color);
+  justify-content: center;
+  margin-top: var(--spacing-lg);
 }
 
 .login-footer {

@@ -4,12 +4,12 @@ import { LoginScreen } from './screens/LoginScreen';
 import { DashboardScreen } from './screens/DashboardScreen';
 import { MyTripsScreen } from './screens/MyTripsScreen';
 import { CreateTripScreen } from './screens/CreateTripScreen';
+import { ItineraryBuilderScreen } from './screens/ItineraryBuilderScreen';
+import { ItineraryViewScreen } from './screens/ItineraryViewScreen';
+import { BudgetScreen } from './screens/BudgetScreen';
 
 // Placeholders for screens
-const ItineraryBuilderScreen = () => <div className="p-4">Itinerary Builder Screen</div>;
-const ItineraryViewScreen = () => <div className="p-4">Itinerary View Screen</div>;
 const SearchScreen = () => <div className="p-4">City/Activity Search Screen</div>;
-const BudgetScreen = () => <div className="p-4">Budget Breakdown Screen</div>;
 const SharedTripScreen = () => <div className="p-4">Shared Trip Screen</div>;
 const ProfileScreen = () => <div className="p-4">Profile Settings Screen</div>;
 
