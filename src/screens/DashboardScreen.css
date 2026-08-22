@@ -1,0 +1,237 @@
+.dashboard-container {
+  padding-bottom: var(--spacing-xl);
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+  color: var(--secondary-color);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+.text-muted {
+  color: #adb5bd;
+}
+
+.mr-2 { margin-right: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mt-4 { margin-top: 1rem; }
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--spacing-xl);
+}
+
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.section-header h2, .inspiration-section h2 {
+  font-size: 1.25rem;
+  color: var(--secondary-color);
+}
+
+.view-all {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.trip-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.trip-card {
+  display: flex;
+  padding: 0 !important;
+  overflow: hidden;
+  height: 120px;
+  cursor: pointer;
+}
+
+.trip-cover {
+  width: 120px;
+  background-color: var(--border-color);
+  background-size: cover;
+  background-position: center;
+}
+
+/* Dummy cover backgrounds */
+.bg-europe { background-color: #f4a261; }
+.bg-tokyo { background-color: #e63946; }
+
+.trip-info {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.trip-info h3 {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.trip-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.trip-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-xl) !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-color);
+  border: 1px dashed var(--border-color);
+}
+
+.destinations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.dest-card {
+  height: 150px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--border-color);
+}
+
+.bg-bali { background-color: #2a9d8f; }
+.bg-rome { background-color: #e76f51; }
+.bg-kyoto { background-color: #f4a261; }
+
+.dest-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--spacing-sm);
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  color: white;
+}
+
+.dest-overlay h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.dashboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.stats-card h3 {
+  font-size: 1.125rem;
+  margin-bottom: var(--spacing-md);
+  color: var(--secondary-color);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-blue-light { background-color: rgba(69, 123, 157, 0.1); }
+.text-blue { color: #457b9d; }
+
+.bg-green-light { background-color: rgba(42, 157, 143, 0.1); }
+.text-green { color: #2a9d8f; }
+
+.stat-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.budget-alert-card {
+  background: linear-gradient(135deg, var(--success) 0%, #21867a 100%);
+  color: white;
+  border: none;
+}
+
+.alert-content h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.125rem;
+}
+
+.alert-content p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+}
+
+.btn-link {
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: underline;
+}
