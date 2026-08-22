@@ -7,7 +7,7 @@ from rest_framework import status
 from django.urls import reverse
 from datetime import date, timedelta
 from trips.serializers import TripListSerializer, TripCreateUpdateSerializer, TripDetailSerializer
-from trips.models import Trip, City, Stop
+from trips.models import Trip, City, Stop, Activity, TripActivity
 
 
 class TripSerializerTestCase(TestCase):
@@ -83,6 +83,12 @@ class TripAPIViewSetTestCase(APITestCase):
             is_public=True
         )
         self.city1 = City.objects.create(name="Paris", country="France")
+        self.activity1 = Activity.objects.create(
+            name="Eiffel Tower Tour",
+            type="Sightseeing",
+            cost=15.00,
+            duration_hours=2
+        )
 
     def test_retrieve_own_trip(self):
         self.client.force_authenticate(user=self.user1)
@@ -237,4 +243,80 @@ class TripAPIViewSetTestCase(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Stop.objects.filter(id=stop.id).exists())
+
+    def test_assign_activity_success(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        url = reverse('assign-activity', kwargs={'stop_id': stop.id})
+        data = {
+            'activity': self.activity1.id,
+            'scheduled_time': '10:00:00',
+            'cost_override': '12.50'
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['activity'], self.activity1.id)
+        self.assertEqual(response.data['cost_override'], '12.50')
+        self.assertEqual(response.data['activity_detail']['name'], "Eiffel Tower Tour")
+        self.assertEqual(response.data['activity_detail']['type'], "Sightseeing")
+
+    def test_assign_activity_other_user_stop_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip2,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        url = reverse('assign-activity', kwargs={'stop_id': stop.id})
+        data = {
+            'activity': self.activity1.id
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_assigned_activity_success(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        trip_activity = TripActivity.objects.create(
+            stop=stop,
+            activity=self.activity1,
+            cost_override=10.00
+        )
+        url = reverse('assign-activity', kwargs={'stop_id': stop.id}) + f"?trip_activity_id={trip_activity.id}"
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(TripActivity.objects.filter(id=trip_activity.id).exists())
+
+    def test_delete_assigned_activity_other_user_stop_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip2,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        trip_activity = TripActivity.objects.create(
+            stop=stop,
+            activity=self.activity1,
+            cost_override=10.00
+        )
+        url = reverse('assign-activity', kwargs={'stop_id': stop.id}) + f"?trip_activity_id={trip_activity.id}"
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(TripActivity.objects.filter(id=trip_activity.id).exists())
 

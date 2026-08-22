@@ -68,8 +68,33 @@ class CityMiniSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'country']
 
 
+class ActivityMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ['id', 'name', 'type', 'cost', 'duration_hours']
+
+
+class TripActivitySerializer(serializers.ModelSerializer):
+    activity_detail = ActivityMiniSerializer(source="activity", read_only=True)
+
+    class Meta:
+        model = TripActivity
+        fields = [
+            'id',
+            'stop',
+            'activity',
+            'activity_detail',
+            'scheduled_time',
+            'cost_override',
+        ]
+        extra_kwargs = {
+            'stop': {'write_only': True}
+        }
+
+
 class StopSerializer(serializers.ModelSerializer):
     city_detail = CityMiniSerializer(source="city", read_only=True)
+    activities = TripActivitySerializer(source="trip_activities", many=True, read_only=True)
 
     class Meta:
         model = Stop
@@ -81,9 +106,11 @@ class StopSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date',
             'order',
+            'activities',
         ]
         extra_kwargs = {
             'trip': {'write_only': True}
         }
+
 
 

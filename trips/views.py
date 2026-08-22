@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Trip, Stop, TripActivity
-from .serializers import TripListSerializer, TripCreateUpdateSerializer, TripDetailSerializer, StopSerializer
+from .serializers import TripListSerializer, TripCreateUpdateSerializer, TripDetailSerializer, StopSerializer, TripActivitySerializer
 
 
 class TripViewSet(viewsets.ModelViewSet):
@@ -64,5 +64,32 @@ class DeleteStopView(APIView):
         stop = get_object_or_404(Stop, id=stop_id, trip__user=request.user)
         stop.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AssignActivityView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, stop_id):
+        stop = get_object_or_404(Stop, id=stop_id, trip__user=request.user)
+        data = request.data.copy()
+        data['stop'] = stop.id
+
+        serializer = TripActivitySerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, stop_id):
+        trip_activity_id = request.query_params.get('trip_activity_id')
+        trip_activity = get_object_or_404(
+            TripActivity,
+            id=trip_activity_id,
+            stop_id=stop_id,
+            stop__trip__user=request.user
+        )
+        trip_activity.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 

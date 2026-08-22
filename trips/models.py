@@ -36,11 +36,17 @@ class Stop(models.Model):
 
 class Activity(models.Model):
     name = models.CharField(max_length=255)
+    type = models.CharField(max_length=255, default="Sightseeing")
+    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    duration_hours = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return self.name
 
 
 class TripActivity(models.Model):
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
+    stop = models.ForeignKey(Stop, on_delete=models.CASCADE, related_name="trip_activities")
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="trip_activities")
+    scheduled_time = models.TimeField(null=True, blank=True)
+    cost_override = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
