@@ -44,14 +44,20 @@ export const AdminDashboardScreen = () => {
   const [userToDelete, setUserToDelete] = useState(null);
 
   const fetchAdminData = async () => {
+    const authToken = token || localStorage.getItem('globetrotter_token');
+    if (!authToken) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const [statsRes, usersRes] = await Promise.all([
         fetch('/api/admin/stats/', {
-          headers: { 'Authorization': `Token ${token}` }
+          headers: { 'Authorization': `Token ${authToken}` }
         }),
         fetch(`/api/admin/users/?search=${encodeURIComponent(searchQuery)}`, {
-          headers: { 'Authorization': `Token ${token}` }
+          headers: { 'Authorization': `Token ${authToken}` }
         })
       ]);
 
@@ -67,7 +73,7 @@ export const AdminDashboardScreen = () => {
         setUsers(usersData.users || []);
       }
     } catch (err) {
-      setFeedback({ type: 'error', message: 'Failed to load live admin analytics.' });
+      console.error("Admin fetch error:", err);
     } finally {
       setLoading(false);
     }
@@ -75,7 +81,7 @@ export const AdminDashboardScreen = () => {
 
   useEffect(() => {
     fetchAdminData();
-  }, [searchQuery]);
+  }, [token, searchQuery]);
 
   const handleToggleStatus = async (user) => {
     try {
