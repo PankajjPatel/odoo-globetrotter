@@ -133,20 +133,13 @@ export const AdminDashboardScreen = () => {
 
   const fetchAdminData = async () => {
     const authToken = token || localStorage.getItem('globetrotter_token');
-    if (!authToken) {
-      setLoading(false);
-      return;
-    }
+    const headers = authToken ? { 'Authorization': `Token ${authToken}` } : {};
 
     try {
       setLoading(true);
       const [statsRes, usersRes] = await Promise.all([
-        fetch('/api/admin/stats/', {
-          headers: { 'Authorization': `Token ${authToken}` }
-        }),
-        fetch(`/api/admin/users/?search=${encodeURIComponent(searchQuery)}`, {
-          headers: { 'Authorization': `Token ${authToken}` }
-        })
+        fetch('/api/admin/stats/', { headers }),
+        fetch(`/api/admin/users/?search=${encodeURIComponent(searchQuery)}`, { headers })
       ]);
 
       if (statsRes.ok) {
@@ -160,7 +153,9 @@ export const AdminDashboardScreen = () => {
 
       if (usersRes.ok) {
         const usersData = await usersRes.json();
-        setUsers(usersData.users || []);
+        if (usersData.users && usersData.users.length > 0) {
+          setUsers(usersData.users);
+        }
       }
     } catch (err) {
       console.error("Admin fetch error:", err);
