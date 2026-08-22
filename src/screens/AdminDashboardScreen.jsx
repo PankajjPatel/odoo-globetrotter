@@ -59,13 +59,13 @@ const DEFAULT_INITIAL_STATS = {
 };
 
 const DEFAULT_POPULAR_CITIES = [
-  { name: 'Goa', country: 'India', cost_index: '$$$', popularity: 'Very High' },
-  { name: 'Jaipur', country: 'India', cost_index: '$$', popularity: 'Very High' },
-  { name: 'Udaipur', country: 'India', cost_index: '$$$', popularity: 'High' },
-  { name: 'Agra', country: 'India', cost_index: '$$', popularity: 'Very High' },
-  { name: 'Delhi', country: 'India', cost_index: '$$', popularity: 'Very High' },
-  { name: 'Manali', country: 'India', cost_index: '$$', popularity: 'High' },
-  { name: 'Varanasi', country: 'India', cost_index: '$', popularity: 'High' },
+  { name: 'Goa', country: 'India', cost_index: '₹18,000 / trip', popularity: 'Very High' },
+  { name: 'Jaipur', country: 'India', cost_index: '₹12,000 / trip', popularity: 'Very High' },
+  { name: 'Udaipur', country: 'India', cost_index: '₹22,000 / trip', popularity: 'High' },
+  { name: 'Agra', country: 'India', cost_index: '₹8,500 / trip', popularity: 'Very High' },
+  { name: 'Delhi', country: 'India', cost_index: '₹10,000 / trip', popularity: 'Very High' },
+  { name: 'Manali', country: 'India', cost_index: '₹16,000 / trip', popularity: 'High' },
+  { name: 'Varanasi', country: 'India', cost_index: '₹6,500 / trip', popularity: 'High' },
 ];
 
 const DEFAULT_GROWTH = [
@@ -189,43 +189,60 @@ export const AdminDashboardScreen = () => {
         setFeedback({ type: 'error', message: data.message || 'Failed to delete user.' });
       }
     } catch {
-      setFeedback({ type: 'error', message: 'Action failed. Please try again.' });
+      setFeedback({ type: 'error', message: 'An unexpected error occurred while deleting user.' });
     } finally {
       setActionLoading(false);
+      setUserToDelete(null);
     }
   };
 
-  const [selectedUserDetail, setSelectedUserDetail] = useState(null);
+  const handleKpiCardClick = (type) => {
+    if (type === 'users') {
+      document.getElementById('user-directory-section')?.scrollIntoView({ behavior: 'smooth' });
+    } else if (type === 'trips') {
+      navigate('/my-trips');
+    } else if (type === 'stops' || type === 'activities') {
+      navigate('/search/city');
+    }
+  };
+
+  const handleCityCardClick = (cityName) => {
+    navigate('/search/city', { state: { initialSearch: cityName } });
+  };
 
   const statCards = [
     {
+      type: 'users',
       title: 'Total Users',
       value: stats ? stats.total_users : '...',
-      label: 'Registered accounts',
+      label: 'Registered accounts (Click to view)',
       icon: Users,
       color: '#3b82f6',
       gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
     },
     {
+      type: 'trips',
       title: 'Active Trips',
       value: stats ? stats.total_trips : '...',
-      label: 'Custom itineraries',
+      label: 'Custom itineraries (Click to explore)',
       icon: Compass,
       color: '#f97316',
       gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
     },
     {
+      type: 'stops',
       title: 'Destinations & Stops',
       value: stats ? stats.total_stops : '...',
-      label: 'Planned city stops',
+      label: 'Planned city stops (Click to search)',
       icon: MapPin,
       color: '#10b981',
       gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)'
     },
     {
+      type: 'activities',
       title: 'Activities Booked',
       value: stats ? (stats.total_trip_activities || stats.total_activities) : '...',
-      label: 'Selected experiences',
+      label: 'Selected experiences (Click to view)',
       icon: Activity,
       color: '#8b5cf6',
       gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)'
@@ -267,7 +284,12 @@ export const AdminDashboardScreen = () => {
       {/* KPI Stats Grid */}
       <div className="admin-kpi-grid">
         {statCards.map((item, idx) => (
-          <Card key={idx} className="kpi-card glass">
+          <Card 
+            key={idx} 
+            className="kpi-card glass hoverable clickable-kpi-card"
+            onClick={() => handleKpiCardClick(item.type)}
+            title={`Click to view ${item.title}`}
+          >
             <div className="kpi-card-header">
               <div className="kpi-icon-box" style={{ background: item.gradient }}>
                 <item.icon size={22} color="#ffffff" />
@@ -329,20 +351,25 @@ export const AdminDashboardScreen = () => {
               <Globe size={20} className="text-primary-brand" />
               <div>
                 <h2>Top Destinations</h2>
-                <p className="card-subtext">Popular verified travel hubs</p>
+                <p className="card-subtext">Click any city to view & plan</p>
               </div>
             </div>
           </div>
           <div className="destination-chips-list">
             {popularCities.length > 0 ? (
               popularCities.map((city, idx) => (
-                <div key={idx} className="destination-chip">
+                <div 
+                  key={idx} 
+                  className="destination-chip clickable-chip hoverable"
+                  onClick={() => handleCityCardClick(city.name)}
+                  title={`Click to explore ${city.name}`}
+                >
                   <div className="chip-icon"><MapPin size={16} /></div>
                   <div className="chip-info">
                     <span className="chip-name">{city.name}</span>
                     <span className="chip-country">{city.country} • {city.popularity}</span>
                   </div>
-                  <span className="chip-cost">{city.cost_index}</span>
+                  <span className="chip-cost-inr">{city.cost_index}</span>
                 </div>
               ))
             ) : (
@@ -353,7 +380,7 @@ export const AdminDashboardScreen = () => {
       </div>
 
       {/* User Management Section */}
-      <Card className="user-management-card glass">
+      <Card id="user-directory-section" className="user-management-card glass">
         <div className="user-management-header">
           <div className="section-title-wrapper">
             <Database size={22} className="text-primary-brand" />

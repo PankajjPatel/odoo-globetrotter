@@ -206,6 +206,17 @@
   gap: 0.75rem;
 }
 
+.clickable-kpi-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.clickable-kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px -4px rgba(15, 23, 42, 0.12);
+  border-color: #cbd5e1;
+}
+
 .destination-chip {
   display: flex;
   align-items: center;
@@ -215,11 +226,6 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   transition: all 0.2s ease;
-}
-
-.destination-chip:hover {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
 }
 
 .chip-icon {
@@ -250,10 +256,25 @@
   color: #64748b;
 }
 
-.chip-cost {
+.clickable-chip {
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.clickable-chip:hover {
+  transform: translateX(4px);
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.chip-cost-inr {
   font-weight: 700;
   font-size: 0.85rem;
   color: #059669;
+  background: #ecfdf5;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #a7f3d0;
 }
 
 .user-management-card {
