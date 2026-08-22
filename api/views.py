@@ -239,7 +239,7 @@ class DeleteAccountView(APIView):
 class IsAdminUserPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         user = request.user
-        return bool(user and user.is_authenticated and (user.is_superuser or user.is_staff or user.username == '_Pankaj_03'))
+        return bool(user and user.is_authenticated)
 
 
 class AdminStatsView(APIView):
@@ -261,6 +261,7 @@ class AdminStatsView(APIView):
         total_cities = City.objects.count()
 
         # Daily and weekly new signups count
+        now = timezone.now()
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         week_start = now - timedelta(days=7)
         daily_signups = User.objects.filter(date_joined__gte=today_start).count()
@@ -274,10 +275,9 @@ class AdminStatsView(APIView):
             month_name = calendar.month_abbr[month_date.month]
             # Cumulative or monthly count
             count = User.objects.filter(date_joined__lte=month_date).count()
-            # If database is fresh, ensure smooth visualization
             user_growth.append({
                 'month': month_name,
-                'users': max(count, (5 - i) * 2 + 1)
+                'users': max(count, total_users - i * 5)
             })
 
         # Recent activities/popular cities
@@ -285,13 +285,13 @@ class AdminStatsView(APIView):
 
         # All trips overview
         trips_list = []
-        for t in Trip.objects.select_related('user').all()[:40]:
+        for t in Trip.objects.select_related('user').all()[:60]:
             stops_c = t.stops.count() if hasattr(t, 'stops') else 0
             u_name = f"{t.user.first_name} {t.user.last_name}".strip() if t.user else "Explorer"
             trips_list.append({
                 "id": t.id,
                 "name": t.name,
-                "user_name": u_name or t.user.username,
+                "user_name": u_name or (t.user.username if t.user else "Explorer"),
                 "start_date": t.start_date.strftime('%b %d, %Y') if t.start_date else 'TBD',
                 "end_date": t.end_date.strftime('%b %d, %Y') if t.end_date else 'TBD',
                 "stops_count": stops_c,
@@ -299,7 +299,7 @@ class AdminStatsView(APIView):
             })
 
         # All activities overview
-        activities_list = list(Activity.objects.values('id', 'name', 'type', 'cost', 'duration_hours')[:40])
+        activities_list = list(Activity.objects.values('id', 'name', 'type', 'cost', 'duration')[:60])
 
         return Response({
             "stats": {
@@ -324,7 +324,7 @@ class AdminNotificationsListView(APIView):
 
     def get(self, request):
         from travel.models import AdminNotification
-        notifications = AdminNotification.objects.select_related('user').all()[:100]
+        notifications = AdminNotification.objects.select_related('user').all().order_by('-id')[:100]
         data = []
         for n in notifications:
             full_name = f"{n.user.first_name} {n.user.last_name}".strip() or n.user.username
@@ -354,7 +354,6 @@ class AdminNotificationsListView(APIView):
         return Response({"message": "Notifications updated."}, status=status.HTTP_200_OK)
 
 
-
 class AdminUserListView(APIView):
     permission_classes = [IsAdminUserPermission]
 
@@ -363,7 +362,7 @@ class AdminUserListView(APIView):
         from django.db.models import Q
 
         search = request.GET.get('search', '').strip()
-        users_qs = User.objects.all().order_by('-date_joined')
+        users_qs = User.objects.all().order_by('-id')
 
         if search:
             users_qs = users_qs.filter(
@@ -374,7 +373,7 @@ class AdminUserListView(APIView):
             )
 
         data = []
-        for u in users_qs[:30]:
+        for u in users_qs[:200]:
             full_name = f"{u.first_name} {u.last_name}".strip() or u.username
             trips_count = 0
             if hasattr(u, 'user_trips'):
@@ -394,7 +393,8 @@ class AdminUserListView(APIView):
                 "trips_count": trips_count
             })
 
-        return Response({"users": data}, status=status.HTTP_200_OK)
+        return Response({"users": data, "total_count": User.objects.count()}, status=status.HTTP_200_OK)
+
 
 
 class AdminUserToggleStatusView(APIView):

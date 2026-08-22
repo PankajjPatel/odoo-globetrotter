@@ -171,6 +171,10 @@ export const AdminDashboardScreen = () => {
 
   useEffect(() => {
     fetchAdminData();
+    const interval = setInterval(() => {
+      fetchAdminData();
+    }, 3000);
+    return () => clearInterval(interval);
   }, [token, searchQuery]);
 
   // CSV Export Helper
