@@ -15,6 +15,7 @@ import { ActivitySearchScreen } from './screens/ActivitySearchScreen';
 import { SharedTripScreen } from './screens/SharedTripScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { AdminDashboardScreen } from './screens/AdminDashboardScreen';
+import { LandingScreen } from './screens/LandingScreen';
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
       <Router>
         <div className="app-container">
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<LandingScreen />} />
             <Route
               path="/login"
               element={

@@ -1,36 +1,93 @@
 .create-trip-container {
-  padding-bottom: var(--spacing-xl);
-  max-width: 800px;
-  margin: 0 auto;
+  min-height: calc(100vh - 70px);
 }
 
-.create-trip-header {
-  text-align: center;
-  margin-bottom: var(--spacing-xl);
+.create-trip-layout {
+  display: flex;
+  min-height: calc(100vh - 70px);
 }
 
-.create-trip-header h1 {
-  font-size: 2.5rem;
-  color: var(--secondary-color);
-  margin-bottom: var(--spacing-sm);
+/* Left side banner */
+.create-trip-banner {
+  flex: 1;
+  background-image: url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&q=80');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: none; /* Hide on mobile */
+}
+
+@media (min-width: 900px) {
+  .create-trip-banner {
+    display: block;
+  }
+}
+
+.banner-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 48, 73, 0.9) 0%, rgba(0, 48, 73, 0.4) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  color: white;
+}
+
+.banner-overlay h1 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  line-height: 1.1;
+}
+
+.banner-overlay p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 400px;
+}
+
+/* Right side form */
+.create-trip-form-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: var(--bg-surface);
 }
 
 .create-trip-form-card {
-  padding: var(--spacing-xl) !important;
+  width: 100%;
+  max-width: 550px;
+  padding: 2.5rem !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.05) !important;
+  border: 1px solid rgba(0,0,0,0.05) !important;
+  border-radius: var(--radius-lg);
 }
 
+.form-title {
+  font-size: 1.75rem;
+  margin-bottom: 2rem;
+  color: var(--secondary-color);
+  text-align: center;
+}
+
+/* Cover Photo Upload */
 .cover-photo-upload {
   width: 100%;
-  height: 200px;
+  height: 180px;
   border: 2px dashed var(--border-color);
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
   background-color: var(--bg-color);
+  overflow: hidden;
+  position: relative;
 }
 
 .cover-photo-upload:hover {
@@ -43,13 +100,20 @@
   color: var(--text-secondary);
 }
 
+.cover-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Inputs */
 .date-inputs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-md);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 500px) {
   .date-inputs {
     grid-template-columns: 1fr;
   }
@@ -57,14 +121,11 @@
 
 .textarea-field {
   resize: vertical;
-  min-height: 100px;
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--spacing-md);
-  border-top: 1px solid var(--border-color);
-  padding-top: var(--spacing-lg);
-  margin-top: var(--spacing-lg);
+  margin-top: 2rem;
 }

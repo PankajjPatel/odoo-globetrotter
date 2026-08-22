@@ -1,0 +1,56 @@
+from django.db import models
+
+
+class City(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    country = models.CharField(max_length=100, default='India')
+    region = models.CharField(max_length=100, blank=True, default='')
+    cost_index = models.CharField(max_length=20, blank=True, default='$$')
+    popularity = models.CharField(max_length=50, blank=True, default='High')
+    description = models.TextField(blank=True, default='')
+    image = models.CharField(max_length=255, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Cities"
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name}, {self.country}"
+
+    @property
+    def costIndex(self):
+        return self.cost_index
+
+    @property
+    def image_url(self):
+        return self.image
+
+
+class Activity(models.Model):
+    name = models.CharField(max_length=200)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='activities')
+    type = models.CharField(max_length=100, blank=True, default='Sightseeing')
+    cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    duration = models.CharField(max_length=50, blank=True, default='2 hours')
+    description = models.TextField(blank=True, default='')
+    image = models.CharField(max_length=255, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Activities"
+        ordering = ['name']
+        unique_together = ('name', 'city')
+
+    def __str__(self):
+        return f"{self.name} ({self.city.name})"
+
+    @property
+    def category(self):
+        return self.type
+
+    @property
+    def image_url(self):
+        return self.image
