@@ -1,104 +1,463 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { Users, MapPin, Activity, Settings } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { 
+  Users, 
+  MapPin, 
+  Activity, 
+  ShieldCheck, 
+  Search, 
+  RefreshCw, 
+  Trash2, 
+  CheckCircle2, 
+  XCircle, 
+  Shield, 
+  Compass, 
+  TrendingUp, 
+  AlertCircle,
+  Database,
+  Globe
+} from 'lucide-react';
+import { 
+  ResponsiveContainer, 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip 
+} from 'recharts';
+import { useAuth } from '../context/AuthContext';
 import './AdminDashboardScreen.css';
 
 export const AdminDashboardScreen = () => {
-  // Dummy Data
-  const stats = [
-    { label: 'Total Users', value: '1,204', icon: Users, color: 'text-blue', bg: 'bg-blue-light' },
-    { label: 'Active Trips', value: '342', icon: MapPin, color: 'text-green', bg: 'bg-green-light' },
-    { label: 'Activities Booked', value: '890', icon: Activity, color: 'text-orange', bg: 'bg-orange-light' },
-  ];
+  const { token, user: currentUser } = useAuth();
+  
+  const [stats, setStats] = useState(null);
+  const [userGrowth, setUserGrowth] = useState([]);
+  const [popularCities, setPopularCities] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
 
-  const userGrowth = [
-    { month: 'Jan', users: 400 },
-    { month: 'Feb', users: 600 },
-    { month: 'Mar', users: 800 },
-    { month: 'Apr', users: 1204 },
+  const fetchAdminData = async () => {
+    try {
+      setLoading(true);
+      const [statsRes, usersRes] = await Promise.all([
+        fetch('/api/admin/stats/', {
+          headers: { 'Authorization': `Token ${token}` }
+        }),
+        fetch(`/api/admin/users/?search=${encodeURIComponent(searchQuery)}`, {
+          headers: { 'Authorization': `Token ${token}` }
+        })
+      ]);
+
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        setStats(statsData.stats);
+        setUserGrowth(statsData.user_growth || []);
+        setPopularCities(statsData.popular_cities || []);
+      }
+
+      if (usersRes.ok) {
+        const usersData = await usersRes.json();
+        setUsers(usersData.users || []);
+      }
+    } catch (err) {
+      setFeedback({ type: 'error', message: 'Failed to load live admin analytics.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdminData();
+  }, [searchQuery]);
+
+  const handleToggleStatus = async (user) => {
+    try {
+      setActionLoading(true);
+      const res = await fetch(`/api/admin/users/${user.id}/toggle-status/`, {
+        method: 'POST',
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setFeedback({ type: 'success', message: data.message });
+        setUsers(prev => prev.map(u => u.id === user.id ? { ...u, is_active: data.is_active } : u));
+      } else {
+        setFeedback({ type: 'error', message: data.message || 'Status toggle failed.' });
+      }
+    } catch {
+      setFeedback({ type: 'error', message: 'Action failed. Please try again.' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleToggleRole = async (user) => {
+    try {
+      setActionLoading(true);
+      const res = await fetch(`/api/admin/users/${user.id}/toggle-role/`, {
+        method: 'POST',
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setFeedback({ type: 'success', message: data.message });
+        setUsers(prev => prev.map(u => u.id === user.id ? { ...u, is_staff: data.is_staff } : u));
+      } else {
+        setFeedback({ type: 'error', message: data.message || 'Role change failed.' });
+      }
+    } catch {
+      setFeedback({ type: 'error', message: 'Action failed. Please try again.' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    try {
+      setActionLoading(true);
+      const res = await fetch(`/api/admin/users/${userToDelete.id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Token ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setFeedback({ type: 'success', message: data.message });
+        setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
+        setUserToDelete(null);
+      } else {
+        setFeedback({ type: 'error', message: data.message || 'Failed to delete user.' });
+      }
+    } catch {
+      setFeedback({ type: 'error', message: 'Action failed. Please try again.' });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const statCards = [
+    {
+      title: 'Total Users',
+      value: stats ? stats.total_users : '...',
+      label: 'Registered accounts',
+      icon: Users,
+      color: '#3b82f6',
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+    },
+    {
+      title: 'Active Trips',
+      value: stats ? stats.total_trips : '...',
+      label: 'Custom itineraries',
+      icon: Compass,
+      color: '#ff5722',
+      gradient: 'linear-gradient(135deg, #ff5722 0%, #d84315 100%)'
+    },
+    {
+      title: 'Destinations & Stops',
+      value: stats ? stats.total_stops : '...',
+      label: 'Planned city stops',
+      icon: MapPin,
+      color: '#10b981',
+      gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)'
+    },
+    {
+      title: 'Activities Booked',
+      value: stats ? (stats.total_trip_activities || stats.total_activities) : '...',
+      label: 'Selected experiences',
+      icon: Activity,
+      color: '#8b5cf6',
+      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)'
+    }
   ];
 
   return (
-    <div className="admin-container container animate-fade-in">
-      <div className="admin-header">
-        <h1>Admin Dashboard</h1>
-        <p className="text-secondary">Platform analytics and user management.</p>
+    <div className="admin-portal-container container animate-fade-in">
+      {/* Header Section */}
+      <div className="admin-portal-header">
+        <div>
+          <div className="admin-badge-pill">
+            <ShieldCheck size={16} /> Global Administrator Portal
+          </div>
+          <h1>System Overview & Analytics</h1>
+          <p className="text-secondary">Real-time database records, platform health, and user privilege controls.</p>
+        </div>
+        <div className="admin-header-actions">
+          <Button 
+            variant="outline" 
+            onClick={fetchAdminData} 
+            disabled={loading || actionLoading}
+            className="refresh-btn"
+          >
+            <RefreshCw size={16} className={`mr-2 ${loading ? 'spin-icon' : ''}`} /> Refresh Data
+          </Button>
+        </div>
       </div>
 
-      <div className="admin-stats-row">
-        {stats.map((stat, i) => (
-          <Card key={i} className="admin-stat-card glass">
-            <div className={`admin-stat-icon ${stat.bg} ${stat.color}`}>
-              <stat.icon size={24} />
+      {/* Action Notification Alert */}
+      {feedback && (
+        <div className={`admin-alert animate-fade-in ${feedback.type === 'error' ? 'alert-error' : 'alert-success'}`}>
+          {feedback.type === 'error' ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}
+          <span>{feedback.message}</span>
+          <button className="close-alert-btn" onClick={() => setFeedback(null)}>×</button>
+        </div>
+      )}
+
+      {/* KPI Stats Grid */}
+      <div className="admin-kpi-grid">
+        {statCards.map((item, idx) => (
+          <Card key={idx} className="kpi-card glass">
+            <div className="kpi-card-header">
+              <div className="kpi-icon-box" style={{ background: item.gradient }}>
+                <item.icon size={22} color="#ffffff" />
+              </div>
+              <span className="kpi-title">{item.title}</span>
             </div>
-            <div className="admin-stat-info">
-              <span className="admin-stat-value">{stat.value}</span>
-              <span className="admin-stat-label">{stat.label}</span>
+            <div className="kpi-body">
+              <div className="kpi-value">{item.value}</div>
+              <div className="kpi-label">{item.label}</div>
             </div>
           </Card>
         ))}
       </div>
 
-      <div className="admin-content-grid">
-        <Card className="admin-chart-card">
-          <div className="card-header-flex">
-            <h2>User Growth</h2>
-            <Button variant="ghost" size="sm">Last 6 Months</Button>
+      {/* Middle Analytics Grid */}
+      <div className="admin-analytics-grid">
+        {/* User Growth Chart */}
+        <Card className="chart-container-card glass">
+          <div className="card-section-header">
+            <div className="section-title-wrapper">
+              <TrendingUp size={20} className="text-primary-brand" />
+              <div>
+                <h2>User Growth Timeline</h2>
+                <p className="card-subtext">Monthly registered explorer trajectory</p>
+              </div>
+            </div>
+            <div className="chart-badge">Live Metric</div>
           </div>
-          <div className="chart-wrapper">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={userGrowth} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} />
-                <Tooltip cursor={{fill: 'rgba(0,0,0,0.05)'}} />
-                <Bar dataKey="users" fill="var(--primary-color)" radius={[4, 4, 0, 0]} />
-              </BarChart>
+          <div className="chart-container">
+            <ResponsiveContainer width="100%" height={260}>
+              <AreaChart data={userGrowth} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ff5722" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#ff5722" stopOpacity={0.0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#ffffff', 
+                    borderRadius: '8px', 
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
+                  }} 
+                />
+                <Area type="monotone" dataKey="users" stroke="#ff5722" strokeWidth={3} fillOpacity={1} fill="url(#growthGrad)" />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </Card>
 
-        <Card className="admin-table-card">
-          <div className="card-header-flex">
-            <h2>Recent Users</h2>
-            <Button variant="outline" size="sm"><Settings size={14} className="mr-1"/> Manage</Button>
+        {/* Database Quick Metrics & Popular Destinations */}
+        <Card className="insights-card glass">
+          <div className="card-section-header">
+            <div className="section-title-wrapper">
+              <Globe size={20} className="text-primary-brand" />
+              <div>
+                <h2>Top Destinations</h2>
+                <p className="card-subtext">Popular verified travel hubs</p>
+              </div>
+            </div>
           </div>
-          <div className="table-responsive">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Trips</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Explorer Doe</td>
-                  <td>explorer@example.com</td>
-                  <td>3</td>
-                  <td><span className="status-badge active">Active</span></td>
-                </tr>
-                <tr>
-                  <td>Jane Smith</td>
-                  <td>jane@example.com</td>
-                  <td>1</td>
-                  <td><span className="status-badge active">Active</span></td>
-                </tr>
-                <tr>
-                  <td>Mike Johnson</td>
-                  <td>mike@example.com</td>
-                  <td>0</td>
-                  <td><span className="status-badge inactive">Inactive</span></td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="destination-chips-list">
+            {popularCities.length > 0 ? (
+              popularCities.map((city, idx) => (
+                <div key={idx} className="destination-chip">
+                  <div className="chip-icon"><MapPin size={16} /></div>
+                  <div className="chip-info">
+                    <span className="chip-name">{city.name}</span>
+                    <span className="chip-country">{city.country} • {city.popularity}</span>
+                  </div>
+                  <span className="chip-cost">{city.cost_index}</span>
+                </div>
+              ))
+            ) : (
+              <p className="text-secondary p-3">No catalog cities found.</p>
+            )}
           </div>
         </Card>
       </div>
+
+      {/* User Management Section */}
+      <Card className="user-management-card glass">
+        <div className="user-management-header">
+          <div className="section-title-wrapper">
+            <Database size={22} className="text-primary-brand" />
+            <div>
+              <h2>User Directory & Access Control</h2>
+              <p className="card-subtext">Manage accounts, toggle roles, and control authorizations.</p>
+            </div>
+          </div>
+          <div className="search-bar-inline">
+            <Search size={18} className="search-icon-inside" />
+            <input 
+              type="text" 
+              placeholder="Search by name, email, or username..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="admin-search-input"
+            />
+          </div>
+        </div>
+
+        <div className="table-responsive">
+          <table className="admin-data-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email Address</th>
+                <th>Role</th>
+                <th>Trips</th>
+                <th>Joined</th>
+                <th>Status</th>
+                <th className="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.length > 0 ? (
+                users.map(u => {
+                  const isSelf = u.id === currentUser?.id;
+                  const isSuper = u.is_superuser;
+                  return (
+                    <tr key={u.id} className={!u.is_active ? 'row-suspended' : ''}>
+                      <td>
+                        <div className="user-cell">
+                          <div className="user-avatar-sm">
+                            {u.full_name.charAt(0).toUpperCase() || u.username.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="user-name-text">
+                              {u.full_name} {isSelf && <span className="self-tag">(You)</span>}
+                            </div>
+                            <div className="user-username-sub">@{u.username}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="email-cell">{u.email}</td>
+                      <td>
+                        {isSuper ? (
+                          <span className="badge-role superuser"><Shield size={12} className="mr-1" /> Superuser</span>
+                        ) : u.is_staff ? (
+                          <span className="badge-role staff"><ShieldCheck size={12} className="mr-1" /> Staff Admin</span>
+                        ) : (
+                          <span className="badge-role traveler">Traveler</span>
+                        )}
+                      </td>
+                      <td>
+                        <span className="trips-count-pill">{u.trips_count} {u.trips_count === 1 ? 'trip' : 'trips'}</span>
+                      </td>
+                      <td className="date-cell">{u.date_joined}</td>
+                      <td>
+                        {u.is_active ? (
+                          <span className="status-indicator-pill active">
+                            <span className="dot"></span> Active
+                          </span>
+                        ) : (
+                          <span className="status-indicator-pill suspended">
+                            <span className="dot"></span> Suspended
+                          </span>
+                        )}
+                      </td>
+                      <td className="text-right actions-cell">
+                        {!isSelf && (
+                          <div className="action-buttons-group">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className={`btn-action-toggle ${u.is_active ? 'btn-warn' : 'btn-activate'}`}
+                              onClick={() => handleToggleStatus(u)}
+                              disabled={actionLoading}
+                              title={u.is_active ? "Suspend access" : "Activate user"}
+                            >
+                              {u.is_active ? <XCircle size={15} /> : <CheckCircle2 size={15} />}
+                              <span>{u.is_active ? 'Suspend' : 'Activate'}</span>
+                            </Button>
+
+                            {!isSuper && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="btn-action-role"
+                                onClick={() => handleToggleRole(u)}
+                                disabled={actionLoading}
+                                title={u.is_staff ? "Demote from Admin" : "Promote to Admin"}
+                              >
+                                <Shield size={15} />
+                                <span>{u.is_staff ? 'Demote' : 'Make Admin'}</span>
+                              </Button>
+                            )}
+
+                            {!isSuper && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="btn-action-delete"
+                                onClick={() => setUserToDelete(u)}
+                                disabled={actionLoading}
+                                title="Delete User"
+                              >
+                                <Trash2 size={15} />
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="7" className="text-center empty-table-msg">
+                    No users matching "{searchQuery}" were found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* Deletion Confirmation Modal */}
+      {userToDelete && (
+        <div className="admin-modal-overlay animate-fade-in">
+          <div className="admin-modal-card glass">
+            <div className="modal-header-danger">
+              <AlertCircle size={28} className="text-danger" />
+              <h3>Confirm Permanent Account Deletion</h3>
+            </div>
+            <p className="modal-body-text">
+              Are you sure you want to delete user <strong>{userToDelete.full_name} (@{userToDelete.username})</strong>? All their trips and saved data will be permanently removed.
+            </p>
+            <div className="modal-actions">
+              <Button variant="ghost" onClick={() => setUserToDelete(null)} disabled={actionLoading}>
+                Cancel
+              </Button>
+              <Button variant="primary" className="btn-danger-solid" onClick={handleDeleteUser} disabled={actionLoading}>
+                {actionLoading ? 'Deleting...' : 'Permanently Delete'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

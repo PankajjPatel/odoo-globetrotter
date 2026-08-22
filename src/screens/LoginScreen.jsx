@@ -4,7 +4,7 @@ import { Card } from '../components/Card';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { useAuth } from '../context/AuthContext';
-import { UserCircle, Compass, AlertCircle, CheckCircle2, Lock, Mail, KeyRound } from 'lucide-react';
+import { UserCircle, Compass, AlertCircle, CheckCircle2, Lock, Mail, KeyRound, Eye, EyeOff } from 'lucide-react';
 import './LoginScreen.css';
 
 export const LoginScreen = () => {
@@ -21,6 +21,9 @@ export const LoginScreen = () => {
     password: '',
     confirmPassword: '',
   });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -126,6 +129,8 @@ export const LoginScreen = () => {
 
   const switchMode = (newMode) => {
     setMode(newMode);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
     setErrorMessage('');
     setSuccessMessage('');
   };
@@ -160,7 +165,7 @@ export const LoginScreen = () => {
           )}
 
           {successMessage && (
-            <div className="auth-alert auth-alert-success animate-fade-in" role="status">
+            <div className="auth-alert auth-alert-success animate-fade-in" role="alert">
               <CheckCircle2 size={18} className="alert-icon" />
               <span>{successMessage}</span>
             </div>
@@ -204,14 +209,23 @@ export const LoginScreen = () => {
                     <input
                       id="login-password"
                       name="password"
-                      type="password"
-                      className="input-field"
+                      type={showPassword ? 'text' : 'password'}
+                      className="input-field has-toggle-icon"
                       placeholder="Enter your password"
                       value={formData.password}
                       onChange={handleChange}
                       disabled={loading}
                       required
                     />
+                    <button
+                      type="button"
+                      className="password-toggle-btn"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex="-1"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                   </div>
                 </div>
 
@@ -269,14 +283,23 @@ export const LoginScreen = () => {
                       <input
                         id="signup-password"
                         name="password"
-                        type="password"
-                        className="input-field"
+                        type={showPassword ? 'text' : 'password'}
+                        className="input-field has-toggle-icon"
                         placeholder="At least 6 characters"
                         value={formData.password}
                         onChange={handleChange}
                         disabled={loading}
                         required
                       />
+                      <button
+                        type="button"
+                        className="password-toggle-btn"
+                        onClick={() => setShowPassword(!showPassword)}
+                        tabIndex="-1"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
                     </div>
                   </div>
 
@@ -287,14 +310,23 @@ export const LoginScreen = () => {
                       <input
                         id="signup-confirm"
                         name="confirmPassword"
-                        type="password"
-                        className="input-field"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        className="input-field has-toggle-icon"
                         placeholder="Re-enter password"
                         value={formData.confirmPassword}
                         onChange={handleChange}
                         disabled={loading}
                         required
                       />
+                      <button
+                        type="button"
+                        className="password-toggle-btn"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        tabIndex="-1"
+                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                      >
+                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -334,14 +366,23 @@ export const LoginScreen = () => {
                     <input
                       id="forgot-new-password"
                       name="password"
-                      type="password"
-                      className="input-field"
+                      type={showPassword ? 'text' : 'password'}
+                      className="input-field has-toggle-icon"
                       placeholder="Minimum 6 characters"
                       value={formData.password}
                       onChange={handleChange}
                       disabled={loading}
                       required
                     />
+                    <button
+                      type="button"
+                      className="password-toggle-btn"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex="-1"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                   </div>
                 </div>
 
@@ -352,14 +393,23 @@ export const LoginScreen = () => {
                     <input
                       id="forgot-confirm-password"
                       name="confirmPassword"
-                      type="password"
-                      className="input-field"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      className="input-field has-toggle-icon"
                       placeholder="Re-enter new password"
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       disabled={loading}
                       required
                     />
+                    <button
+                      type="button"
+                      className="password-toggle-btn"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      tabIndex="-1"
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
                   </div>
                 </div>
 

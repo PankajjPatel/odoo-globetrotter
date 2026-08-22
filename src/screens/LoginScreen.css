@@ -148,6 +148,32 @@
   transition: all 0.2s ease;
 }
 
+.input-with-icon-left .input-field.has-toggle-icon {
+  padding-right: 2.5rem;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  color: var(--primary-color, #ff5722);
+  background-color: rgba(255, 87, 34, 0.08);
+}
+
 .input-with-icon-left .input-field:focus {
   outline: none;
   border-color: var(--primary-color, #ff5722);

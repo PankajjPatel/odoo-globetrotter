@@ -165,6 +165,44 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const updateProfile = async (profileData) => {
+    if (!token) throw new Error('Not authenticated.');
+    const res = await fetch('/api/auth/profile/', {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(profileData),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'Failed to update profile.');
+    }
+    if (data.user) {
+      setUser(data.user);
+      localStorage.setItem('globetrotter_user', JSON.stringify(data.user));
+    }
+    return data;
+  };
+
+  const deleteAccount = async () => {
+    if (!token) throw new Error('Not authenticated.');
+    const res = await fetch('/api/auth/delete-account/', {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'Failed to delete account.');
+    }
+    logout();
+    return data;
+  };
+
   const logout = async () => {
     try {
       if (token) {
@@ -195,6 +233,8 @@ export const AuthProvider = ({ children }) => {
     login,
     forgotPassword,
     logout,
+    updateProfile,
+    deleteAccount,
     setUser,
   };
 
