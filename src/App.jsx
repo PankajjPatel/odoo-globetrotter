@@ -1,4 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { PublicOnlyRoute } from './components/PublicOnlyRoute';
 import { Layout } from './components/Layout';
 import { LoginScreen } from './screens/LoginScreen';
 import { DashboardScreen } from './screens/DashboardScreen';
@@ -13,32 +16,46 @@ import { SharedTripScreen } from './screens/SharedTripScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { AdminDashboardScreen } from './screens/AdminDashboardScreen';
 
-// We have now implemented all screens!
-
 function App() {
   return (
-    <Router>
-      <div className="app-container">
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/login" element={<LoginScreen />} />
-          <Route element={<Layout />}>
-            <Route path="/dashboard" element={<DashboardScreen />} />
-            <Route path="/create-trip" element={<CreateTripScreen />} />
-            <Route path="/my-trips" element={<MyTripsScreen />} />
-            <Route path="/trip/:id/builder" element={<ItineraryBuilderScreen />} />
-            <Route path="/trip/:id/view" element={<ItineraryViewScreen />} />
-            <Route path="/search/city" element={<CitySearchScreen />} />
-            <Route path="/search/activity" element={<ActivitySearchScreen />} />
-            <Route path="/trip/:id/budget" element={<BudgetScreen />} />
-            <Route path="/profile" element={<ProfileScreen />} />
-            <Route path="/admin" element={<AdminDashboardScreen />} />
-          </Route>
-          {/* Shared route might not need layout or has its own layout */}
-          <Route path="/share/:id" element={<SharedTripScreen />} />
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="app-container">
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route
+              path="/login"
+              element={
+                <PublicOnlyRoute>
+                  <LoginScreen />
+                </PublicOnlyRoute>
+              }
+            />
+            {/* Protected Routes inside Layout */}
+            <Route
+              element={
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<DashboardScreen />} />
+              <Route path="/create-trip" element={<CreateTripScreen />} />
+              <Route path="/my-trips" element={<MyTripsScreen />} />
+              <Route path="/trip/:id/builder" element={<ItineraryBuilderScreen />} />
+              <Route path="/trip/:id/view" element={<ItineraryViewScreen />} />
+              <Route path="/search/city" element={<CitySearchScreen />} />
+              <Route path="/search/activity" element={<ActivitySearchScreen />} />
+              <Route path="/trip/:id/budget" element={<BudgetScreen />} />
+              <Route path="/profile" element={<ProfileScreen />} />
+              <Route path="/admin" element={<AdminDashboardScreen />} />
+            </Route>
+            {/* Shared public itinerary route */}
+            <Route path="/share/:id" element={<SharedTripScreen />} />
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

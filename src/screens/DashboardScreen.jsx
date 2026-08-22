@@ -4,9 +4,13 @@ import { Card } from '../components/Card';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { MapPin, Calendar, Plus, Search, Filter, SlidersHorizontal, DollarSign } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './DashboardScreen.css';
 
 export const DashboardScreen = () => {
+  const { user } = useAuth();
+  const displayName = user?.full_name || user?.first_name || user?.username || 'Explorer';
+
   // Dummy data
   const upcomingTrips = [
     { id: 1, name: 'Summer in Europe', dates: 'Jun 15 - Jun 30', cover: 'bg-europe' },
@@ -27,7 +31,7 @@ export const DashboardScreen = () => {
       {/* Banner Section */}
       <div className="dashboard-banner">
         <div className="banner-content">
-          <h1>Welcome back, Explorer! 👋</h1>
+          <h1>Welcome back, {displayName}! 👋</h1>
           <p>Ready for your next adventure?</p>
           
           {/* Budget Highlights inside banner to satisfy requirements */}

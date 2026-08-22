@@ -1,12 +1,22 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { MapPin, LayoutDashboard, PlusCircle, Compass, Settings, User, LogOut } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { MapPin, LayoutDashboard, PlusCircle, Compass, User, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 export const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, isAuthenticated } = useAuth();
 
-  if (location.pathname === '/login') return null;
+  if (location.pathname === '/login' || !isAuthenticated) return null;
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
+
+  const displayName = user?.full_name || user?.first_name || user?.username || 'Explorer';
 
   return (
     <nav className="navbar glass">
@@ -27,8 +37,21 @@ export const Navbar = () => {
           </Link>
         </div>
         <div className="navbar-profile">
-          <Link to="/profile" className="profile-btn"><User size={20}/></Link>
-          <Link to="/login" className="logout-btn"><LogOut size={20}/></Link>
+          <Link to="/profile" className="profile-btn" title={`Profile: ${displayName}`}>
+            <User size={20}/>
+            <span className="navbar-username" style={{ fontSize: '0.85rem', fontWeight: '500', marginLeft: '6px' }}>
+              {displayName.split(' ')[0]}
+            </span>
+          </Link>
+          <button 
+            type="button" 
+            onClick={handleLogout} 
+            className="logout-btn" 
+            title="Log Out"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+          >
+            <LogOut size={20}/>
+          </button>
         </div>
       </div>
     </nav>

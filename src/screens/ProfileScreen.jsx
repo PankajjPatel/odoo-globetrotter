@@ -3,14 +3,17 @@ import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { UserCircle, Trash2, Globe, Heart } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './ProfileScreen.css';
 
 export const ProfileScreen = () => {
+  const { user } = useAuth();
   const [profile, setProfile] = useState({
-    name: 'Explorer Doe',
-    email: 'explorer@example.com',
+    name: user?.full_name || user?.first_name || 'Explorer Doe',
+    email: user?.email || 'explorer@example.com',
     language: 'English',
   });
+
 
   const savedDestinations = ['Kyoto, Japan', 'Reykjavik, Iceland', 'Banff, Canada'];
 
