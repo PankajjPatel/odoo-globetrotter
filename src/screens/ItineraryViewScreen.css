@@ -186,5 +186,117 @@
   border-radius: var(--radius-sm);
 }
 
+.activity-timeline-clickable {
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+  position: relative;
+}
+
+.activity-timeline-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-left-color: var(--primary-color) !important;
+}
+
+.act-click-hint {
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.activity-timeline-clickable:hover .act-click-hint {
+  opacity: 1;
+}
+
+.calendar-view-container {
+  margin-top: var(--spacing-lg);
+}
+
+.calendar-grid-header {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.calendar-day-card {
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+}
+
+.calendar-day-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.cal-day-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cal-day-date {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.cal-day-city {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.cal-activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cal-activity-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cal-activity-pill:hover {
+  background: rgba(247, 127, 0, 0.08);
+  border-color: var(--primary-color);
+  transform: translateX(3px);
+}
+
+.cal-act-time {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.cal-act-name {
+  flex: 1;
+  margin: 0 0.5rem;
+  font-weight: 500;
+}
+
+.cal-act-cost {
+  font-weight: 700;
+  color: var(--success);
+  font-size: 0.8rem;
+}
+
 .p-xl { padding: 3rem; }
 .mx-auto { margin-left: auto; margin-right: auto; }
+

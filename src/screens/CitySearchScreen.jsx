@@ -57,6 +57,15 @@ export const CitySearchScreen = () => {
     navigate('/create-trip', { state: { prefilledDestination: cityName } });
   };
 
+  const displayCityCost = (cost) => {
+    if (!cost) return '2,500 Rupees / day';
+    if (cost.includes('Rupees') || cost.includes('rupees')) return cost;
+    if (cost === '₹₹₹' || cost === '$$$') return '5,000 Rupees / day (Luxury)';
+    if (cost === '₹₹' || cost === '$$') return '2,500 Rupees / day (Moderate)';
+    if (cost === '₹' || cost === '$') return '1,200 Rupees / day (Budget)';
+    return `${cost} Rupees / day`;
+  };
+
   return (
     <div className="city-search-container container animate-fade-in">
       <div className="search-header-large">
@@ -101,10 +110,10 @@ export const CitySearchScreen = () => {
           value={selectedCost}
           onChange={(e) => setSelectedCost(e.target.value)}
         >
-          <option value="Any Cost">Any Cost</option>
-          <option value="₹">Budget (₹)</option>
-          <option value="₹₹">Moderate (₹₹)</option>
-          <option value="₹₹₹">Luxury (₹₹₹)</option>
+          <option value="Any Cost">Any Price Range</option>
+          <option value="₹">Budget (1,200 Rupees/day)</option>
+          <option value="₹₹">Moderate (2,500 Rupees/day)</option>
+          <option value="₹₹₹">Luxury (5,000 Rupees/day)</option>
         </select>
       </div>
 
@@ -128,7 +137,7 @@ export const CitySearchScreen = () => {
                   </div>
                   <div className="city-meta-tags">
                     <span className="meta-tag"><TrendingUp size={14}/> {city.popularity || 'Popular'}</span>
-                    <span className="meta-tag">₹ Cost: {city.cost_index || '₹₹'}</span>
+                    <span className="meta-tag font-semibold text-success">{displayCityCost(city.cost_index)}</span>
                   </div>
                   <Button 
                     variant="primary" 

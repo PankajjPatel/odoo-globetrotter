@@ -107,6 +107,51 @@
   box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08);
 }
 
+.active-kpi-border {
+  border-color: #f97316 !important;
+  background: #fffaf5 !important;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2) !important;
+}
+
+.admin-category-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cat-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.95rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cat-tab-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.cat-tab-btn.active {
+  background: #f97316;
+  color: #ffffff;
+  border-color: #ea580c;
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.25);
+}
+
+.kpi-cities-grid, .kpi-activities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
 .kpi-card-header {
   display: flex;
   align-items: center;

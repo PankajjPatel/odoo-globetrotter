@@ -1,117 +1,73 @@
 import React, { useState } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
+import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { MapPin, Calendar as CalendarIcon, Clock, Edit3, ArrowLeft, DollarSign } from 'lucide-react';
+import { MapPin, Calendar as CalendarIcon, Clock, ArrowLeft, DollarSign, Sparkles, X, Compass, ExternalLink } from 'lucide-react';
 import './ItineraryViewScreen.css';
 
 export const ItineraryViewScreen = () => {
   const { id } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
+  const [selectedActivity, setSelectedActivity] = useState(null);
 
   const templateCity = location.state?.templateCity;
 
-  // Dummy Database for templates
+  // Dummy Database for templates with realistic Rupees pricing
   const tripTemplates = {
     'Goa': {
-      title: 'Ultimate Goa Getaway',
+      title: 'Ultimate Goa Coastal Getaway',
       dates: 'Aug 10 - Aug 14, 2026',
       itinerary: [
         {
           date: 'August 10, 2026', city: 'Goa, India',
           activities: [
-            { time: '11:00 AM', name: 'Arrival & Check-in at Resort', cost: '₹0' },
-            { time: '02:00 PM', name: 'Baga Beach Relaxation', cost: '₹500' },
-            { time: '08:00 PM', name: 'Seafood Dinner at Tito\'s', cost: '₹1,500' }
+            { time: '11:00 AM', name: 'Arrival & Check-in at Beachfront Resort', cost: 'Free', duration: '1 hour', description: 'Check-in and relax at the luxury seaside cottages in Calangute.' },
+            { time: '02:00 PM', name: 'Baga Beach Relaxation & Water Sports', cost: '2,500 Rupees', duration: '3 hours', description: 'Parasailing, jet ski rides, and ocean-side refreshments at Baga.' },
+            { time: '08:00 PM', name: 'Seafood Candlelight Dinner at Tito\'s', cost: '1,500 Rupees', duration: '2 hours', description: 'Traditional Goan prawn curry and coastal delicacies.' }
           ]
         },
         {
           date: 'August 11, 2026', city: 'Goa, India',
           activities: [
-            { time: '09:00 AM', name: 'Dudhsagar Waterfalls Trip', cost: '₹2,000' },
-            { time: '05:00 PM', name: 'Sunset Cruise on Mandovi', cost: '₹800' }
+            { time: '09:00 AM', name: 'Dudhsagar Waterfalls Jeep Safari', cost: '2,000 Rupees', duration: '4 hours', description: 'Four-tiered waterfall nestled in Bhagwan Mahaveer Sanctuary.' },
+            { time: '05:00 PM', name: 'Mandovi River Sunset Cruise', cost: '850 Rupees', duration: '2 hours', description: 'Evening cultural cruise with live folk dance and music.' }
           ]
         }
       ]
     },
     'Jaipur': {
-      title: 'Royal Jaipur Tour',
+      title: 'Royal Heritage Jaipur Tour',
       dates: 'Oct 5 - Oct 8, 2026',
       itinerary: [
         {
           date: 'October 5, 2026', city: 'Jaipur, India',
           activities: [
-            { time: '10:00 AM', name: 'Amber Fort Elephant Ride', cost: '₹1,200' },
-            { time: '02:00 PM', name: 'Hawa Mahal Photo Walk', cost: '₹200' },
-            { time: '07:00 PM', name: 'Chokhi Dhani Cultural Dinner', cost: '₹1,000' }
-          ]
-        }
-      ]
-    },
-    'Kerala': {
-      title: 'Serene Kerala Escape',
-      dates: 'Nov 1 - Nov 6, 2026',
-      itinerary: [
-        {
-          date: 'November 1, 2026', city: 'Munnar, India',
-          activities: [
-            { time: '09:00 AM', name: 'Tea Gardens Tour', cost: '₹400' },
-            { time: '02:00 PM', name: 'Eravikulam National Park', cost: '₹350' }
-          ]
-        },
-        {
-          date: 'November 2, 2026', city: 'Alleppey, India',
-          activities: [
-            { time: '12:00 PM', name: 'Houseboat Check-in', cost: '₹8,000' },
-            { time: '08:00 PM', name: 'Backwater Dinner', cost: '₹0' }
-          ]
-        }
-      ]
-    },
-    'Bali': {
-      title: 'Bali Tropical Adventure',
-      dates: 'Dec 10 - Dec 18, 2026',
-      itinerary: [
-        {
-          date: 'December 10, 2026', city: 'Ubud, Bali',
-          activities: [
-            { time: '10:00 AM', name: 'Sacred Monkey Forest', cost: '₹450' },
-            { time: '03:00 PM', name: 'Tegalalang Rice Terrace', cost: '₹300' }
-          ]
-        }
-      ]
-    },
-    'Dubai': {
-      title: 'Luxury Dubai Experience',
-      dates: 'Jan 5 - Jan 10, 2027',
-      itinerary: [
-        {
-          date: 'January 5, 2027', city: 'Dubai, UAE',
-          activities: [
-            { time: '04:00 PM', name: 'Desert Safari & BBQ', cost: '₹4,500' },
-            { time: '09:00 PM', name: 'Burj Khalifa Top View', cost: '₹3,800' }
+            { time: '10:00 AM', name: 'Amber Fort Jeep Ride & Palace Tour', cost: '500 Rupees', duration: '3.5 hours', description: 'Hilltop fort with artistic Hindu architecture overlooking Maota Lake.' },
+            { time: '02:00 PM', name: 'Hawa Mahal & City Palace Photo Walk', cost: '700 Rupees', duration: '2 hours', description: 'Palace of Winds with 953 honeycomb windows and royal courtyards.' },
+            { time: '07:00 PM', name: 'Chokhi Dhani Cultural Dinner', cost: '1,200 Rupees', duration: '3 hours', description: 'Rajasthani folk dance, camel rides, and traditional thali.' }
           ]
         }
       ]
     },
     'default': {
-      title: 'Summer in Europe',
+      title: 'Golden Triangle & Taj Heritage Journey',
       dates: 'Jun 15 - Jun 30, 2026',
       itinerary: [
         {
           date: 'June 15, 2026', city: 'Agra, India',
           activities: [
-            { time: '10:00 AM', name: 'Taj Mahal Guided Tour', cost: '₹2,500' },
-            { time: '01:00 PM', name: 'Lunch at Local Cafe', cost: '₹800' },
-            { time: '03:30 PM', name: 'Agra Fort Visit', cost: '₹500' }
+            { time: '10:00 AM', name: 'Taj Mahal Guided Sunrise Tour', cost: '1,100 Rupees', duration: '3 hours', description: 'Iconic white marble mausoleum with historical guided tour.' },
+            { time: '01:00 PM', name: 'Lunch at Local Mughlai Cafe', cost: '800 Rupees', duration: '1.5 hours', description: 'Authentic Agra petha, biryani, and rich Mughlai cuisine.' },
+            { time: '03:30 PM', name: 'Agra Fort Historical Architecture Visit', cost: '500 Rupees', duration: '2 hours', description: 'Red sandstone fortress of the Mughal empire with Yamuna views.' }
           ]
         },
         {
           date: 'June 16, 2026', city: 'Agra, India',
           activities: [
-            { time: '09:00 AM', name: 'Fatehpur Sikri Excursion', cost: '₹1,500' },
-            { time: '06:00 PM', name: 'Sunset by Yamuna River', cost: '₹200' }
+            { time: '09:00 AM', name: 'Fatehpur Sikri Royal City Excursion', cost: '1,500 Rupees', duration: '3 hours', description: 'Ancient fortified city founded by Emperor Akbar in 1571.' },
+            { time: '06:00 PM', name: 'Sunset by Mehtab Bagh & Yamuna River', cost: '300 Rupees', duration: '1.5 hours', description: 'Quiet sunset viewpoint behind the Taj Mahal reflecting in the water.' }
           ]
         }
       ]
@@ -132,7 +88,7 @@ export const ItineraryViewScreen = () => {
             <ArrowLeft size={16} className="mr-1" /> Back to Dashboard
           </Link>
           <h1>{activeTrip.title}</h1>
-          <p className="text-secondary"><CalendarIcon size={16} className="inline-icon" /> {activeTrip.dates}</p>
+          <p className="text-secondary"><CalendarIcon size={16} className="inline-icon mr-1" /> {activeTrip.dates}</p>
         </div>
         <div className="view-actions">
           <div className="view-toggle">
@@ -170,13 +126,19 @@ export const ItineraryViewScreen = () => {
                 
                 <div className="activities-timeline">
                   {day.activities.map((act, actIdx) => (
-                    <Card key={actIdx} className="activity-card hoverable">
+                    <div 
+                      key={actIdx} 
+                      className="activity-card activity-timeline-clickable hoverable glass"
+                      onClick={() => setSelectedActivity({ ...act, city: day.city, date: day.date })}
+                      title="Click to view activity details & schedule"
+                    >
                       <div className="act-time"><Clock size={16} className="mr-1"/> {act.time}</div>
                       <div className="act-details">
                         <h4>{act.name}</h4>
-                        <span className="act-cost">{act.cost}</span>
+                        <span className="act-cost font-semibold">{act.cost}</span>
                       </div>
-                    </Card>
+                      <span className="act-click-hint">Click details →</span>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -184,14 +146,89 @@ export const ItineraryViewScreen = () => {
           ))}
         </div>
       ) : (
-        <div className="calendar-view-placeholder">
-          <Card className="glass p-xl text-center">
-            <CalendarIcon size={48} className="text-muted mx-auto mb-4" />
-            <h3>Calendar View</h3>
-            <p className="text-secondary">A full month-grid calendar goes here in the real implementation.</p>
-          </Card>
+        <div className="calendar-view-container">
+          <div className="calendar-grid-header">
+            {itinerary.map((day, idx) => (
+              <Card key={idx} className="calendar-day-card glass">
+                <div className="calendar-day-top">
+                  <span className="cal-day-name">Day {idx + 1}</span>
+                  <span className="cal-day-date">{day.date}</span>
+                </div>
+                <div className="cal-day-city"><MapPin size={12} className="mr-1"/> {day.city}</div>
+                <div className="cal-activities-list">
+                  {day.activities.map((act, actI) => (
+                    <div 
+                      key={actI} 
+                      className="cal-activity-pill"
+                      onClick={() => setSelectedActivity({ ...act, city: day.city, date: day.date })}
+                    >
+                      <span className="cal-act-time">{act.time}</span>
+                      <span className="cal-act-name">{act.name}</span>
+                      <span className="cal-act-cost">{act.cost}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Activity Details Modal */}
+      {selectedActivity && (
+        <div className="admin-modal-overlay animate-fade-in" onClick={() => setSelectedActivity(null)}>
+          <div className="admin-modal-card user-detail-modal-card glass" onClick={(e) => e.stopPropagation()}>
+            <div className="user-modal-header">
+              <div className="kpi-modal-icon-badge">
+                <Sparkles size={24} />
+              </div>
+              <div className="user-modal-title-box">
+                <h3>{selectedActivity.name}</h3>
+                <p className="user-modal-handle">{selectedActivity.city} • Scheduled on {selectedActivity.date}</p>
+              </div>
+              <button className="modal-close-btn" onClick={() => setSelectedActivity(null)}>×</button>
+            </div>
+
+            <div className="user-modal-body">
+              <div className="user-details-info-grid">
+                <div className="info-item-card">
+                  <span className="info-item-label">Scheduled Time</span>
+                  <span className="info-item-value">{selectedActivity.time}</span>
+                </div>
+                <div className="info-item-card">
+                  <span className="info-item-label">Estimated Cost</span>
+                  <span className="info-item-value highlight">{selectedActivity.cost}</span>
+                </div>
+                <div className="info-item-card">
+                  <span className="info-item-label">Duration</span>
+                  <span className="info-item-value">{selectedActivity.duration || '2 hours'}</span>
+                </div>
+                <div className="info-item-card">
+                  <span className="info-item-label">Destination</span>
+                  <span className="info-item-value">{selectedActivity.city}</span>
+                </div>
+              </div>
+
+              <div className="user-trips-overview-section">
+                <h4>Experience Overview</h4>
+                <p className="text-secondary font-sm">
+                  {selectedActivity.description || 'Verified curated travel experience arranged in your customized daily itinerary.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="modal-footer-row gap-2">
+              <Button variant="outline" onClick={() => { setSelectedActivity(null); navigate('/search/activity'); }}>
+                Explore Similar Activities
+              </Button>
+              <Button variant="primary" onClick={() => setSelectedActivity(null)}>
+                Close Details
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 };
+

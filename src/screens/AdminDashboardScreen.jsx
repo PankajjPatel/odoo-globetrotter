@@ -69,13 +69,13 @@ const DEFAULT_INITIAL_STATS = {
 };
 
 const DEFAULT_POPULAR_CITIES = [
-  { id: 1, name: 'Goa', country: 'India', cost_index: '₹₹₹', popularity: 'Very High' },
-  { id: 2, name: 'Jaipur', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
-  { id: 3, name: 'Udaipur', country: 'India', cost_index: '₹₹₹', popularity: 'High' },
-  { id: 4, name: 'Agra', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
-  { id: 5, name: 'Delhi', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
-  { id: 6, name: 'Manali', country: 'India', cost_index: '₹₹', popularity: 'High' },
-  { id: 7, name: 'Varanasi', country: 'India', cost_index: '₹', popularity: 'High' },
+  { id: 1, name: 'Goa', country: 'India', cost_index: '5,000 Rupees / day (Luxury)', popularity: 'Very High' },
+  { id: 2, name: 'Jaipur', country: 'India', cost_index: '2,500 Rupees / day (Moderate)', popularity: 'Very High' },
+  { id: 3, name: 'Udaipur', country: 'India', cost_index: '4,000 Rupees / day (Luxury)', popularity: 'High' },
+  { id: 4, name: 'Agra', country: 'India', cost_index: '2,000 Rupees / day (Moderate)', popularity: 'Very High' },
+  { id: 5, name: 'Delhi', country: 'India', cost_index: '2,200 Rupees / day (Moderate)', popularity: 'Very High' },
+  { id: 6, name: 'Manali', country: 'India', cost_index: '2,800 Rupees / day (Moderate)', popularity: 'High' },
+  { id: 7, name: 'Varanasi', country: 'India', cost_index: '1,200 Rupees / day (Budget)', popularity: 'High' },
 ];
 
 const DEFAULT_GROWTH = [
@@ -99,14 +99,14 @@ const DEFAULT_INITIAL_TRIPS = [
 ];
 
 const DEFAULT_INITIAL_ACTIVITIES = [
-  { id: 1, name: 'Taj Mahal Sunrise Tour', type: 'Sightseeing', cost: '1,100', duration_hours: 3 },
-  { id: 2, name: 'Amber Fort Elephant & Jeep Ride', type: 'History', cost: '500', duration_hours: 3 },
-  { id: 3, name: 'Baga Beach Watersports Combo', type: 'Adventure', cost: '2,500', duration_hours: 4 },
-  { id: 4, name: 'Lake Pichola Sunset Boat Cruise', type: 'Sightseeing', cost: '850', duration_hours: 2 },
-  { id: 5, name: 'Solang Valley Paragliding Experience', type: 'Adventure', cost: '3,200', duration_hours: 3 },
+  { id: 1, name: 'Taj Mahal Sunrise Tour', type: 'Sightseeing', cost: '1,100 Rupees', duration_hours: 3 },
+  { id: 2, name: 'Amber Fort Elephant & Jeep Ride', type: 'History', cost: '500 Rupees', duration_hours: 3 },
+  { id: 3, name: 'Baga Beach Watersports Combo', type: 'Adventure', cost: '2,500 Rupees', duration_hours: 4 },
+  { id: 4, name: 'Lake Pichola Sunset Boat Cruise', type: 'Sightseeing', cost: '850 Rupees', duration_hours: 2 },
+  { id: 5, name: 'Solang Valley Paragliding Experience', type: 'Adventure', cost: '3,200 Rupees', duration_hours: 3 },
   { id: 6, name: 'Dashashwamedh Ghat Ganga Aarti', type: 'Culture', cost: 'Free', duration_hours: 2 },
-  { id: 7, name: 'Qutub Minar Architectural Walk', type: 'History', cost: '350', duration_hours: 2 },
-  { id: 8, name: 'Gateway of India & Elephanta Caves', type: 'Sightseeing', cost: '750', duration_hours: 4 },
+  { id: 7, name: 'Qutub Minar Architectural Walk', type: 'History', cost: '350 Rupees', duration_hours: 2 },
+  { id: 8, name: 'Gateway of India & Elephanta Caves', type: 'Sightseeing', cost: '750 Rupees', duration_hours: 4 },
 ];
 
 export const AdminDashboardScreen = () => {
@@ -120,6 +120,7 @@ export const AdminDashboardScreen = () => {
   const [allTrips, setAllTrips] = useState(DEFAULT_INITIAL_TRIPS);
   const [allActivities, setAllActivities] = useState(DEFAULT_INITIAL_ACTIVITIES);
   
+  const [inlineKpiView, setInlineKpiView] = useState('users'); // 'users' | 'trips' | 'destinations' | 'activities'
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -128,6 +129,7 @@ export const AdminDashboardScreen = () => {
   const [selectedUserDetail, setSelectedUserDetail] = useState(null);
   const [activeKpiModal, setActiveKpiModal] = useState(null); // 'users' | 'trips' | 'destinations' | 'activities'
   const [kpiModalSearch, setKpiModalSearch] = useState('');
+
 
   const fetchAdminData = async () => {
     const authToken = token || localStorage.getItem('globetrotter_token');
@@ -345,6 +347,23 @@ export const AdminDashboardScreen = () => {
     }
   ];
 
+  const formatCityCost = (cost) => {
+    if (!cost) return '2,500 Rupees / day';
+    if (cost.includes('Rupees') || cost.includes('rupees')) return cost;
+    if (cost === '₹₹₹' || cost === '$$$') return '5,000 Rupees / day (Luxury)';
+    if (cost === '₹₹' || cost === '$$') return '2,500 Rupees / day (Moderate)';
+    if (cost === '₹' || cost === '$') return '1,200 Rupees / day (Budget)';
+    return `${cost} Rupees / day`;
+  };
+
+  const handleKpiCardClick = (type) => {
+    setInlineKpiView(type);
+    const element = document.getElementById('admin-directory-section');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="admin-portal-container container animate-fade-in">
       {/* Header Section with CSV Export Toolbar */}
@@ -393,27 +412,21 @@ export const AdminDashboardScreen = () => {
         </div>
       )}
 
-      {/* KPI Stats Grid - All Clickable */}
+      {/* KPI Stats Grid - All Clickable & Updates In-Place List */}
       <div className="admin-kpi-grid">
         {statCards.map((item, idx) => (
           <div 
             key={idx} 
             role="button"
             tabIndex={0}
-            className="kpi-card kpi-card-clickable glass"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setKpiModalSearch('');
-              setActiveKpiModal(item.type);
-            }}
+            className={`kpi-card kpi-card-clickable glass ${inlineKpiView === item.type ? 'active-kpi-border' : ''}`}
+            onClick={() => handleKpiCardClick(item.type)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                setKpiModalSearch('');
-                setActiveKpiModal(item.type);
+                handleKpiCardClick(item.type);
               }
             }}
-            title={`${item.title} — ${item.subtext}`}
+            title={`Click to view all ${item.title.toLowerCase()} right below`}
           >
             <div className="kpi-card-header">
               <div className="kpi-icon-box" style={{ background: item.gradient }}>
@@ -426,8 +439,8 @@ export const AdminDashboardScreen = () => {
               <div className="kpi-label">{item.label}</div>
             </div>
             <div className="kpi-card-footer">
-              <span>{item.subtext}</span>
-              <span className="kpi-arrow-icon">→</span>
+              <span className="font-semibold text-primary-brand">View {item.title} list below</span>
+              <span className="kpi-arrow-icon">↓</span>
             </div>
           </div>
         ))}
@@ -480,7 +493,7 @@ export const AdminDashboardScreen = () => {
               <Globe size={20} className="text-primary-brand" />
               <div>
                 <h2>Top Destinations</h2>
-                <p className="card-subtext">Click any city to view & plan in next page</p>
+                <p className="card-subtext">Click any city to view & plan on next page</p>
               </div>
             </div>
           </div>
@@ -498,7 +511,7 @@ export const AdminDashboardScreen = () => {
                     <span className="chip-name">{city.name}</span>
                     <span className="chip-country">{city.country} • {city.popularity}</span>
                   </div>
-                  <span className="chip-cost">{city.cost_index}</span>
+                  <span className="chip-cost font-semibold">{formatCityCost(city.cost_index)}</span>
                   <ExternalLink size={13} className="ml-1 text-secondary" />
                 </div>
               ))
@@ -509,127 +522,258 @@ export const AdminDashboardScreen = () => {
         </Card>
       </div>
 
-      {/* User Management Section */}
-      <Card className="user-management-card glass">
+      {/* In-Place Dynamic Directory Section for All 4 KPI Cards */}
+      <Card id="admin-directory-section" className="user-management-card glass">
         <div className="user-management-header">
           <div className="section-title-wrapper">
             <Database size={22} className="text-primary-brand" />
             <div>
-              <h2>User Directory & Access Control</h2>
-              <p className="card-subtext">Click any user row to open their full identity details and trips dossier.</p>
+              <h2>
+                {inlineKpiView === 'users' && 'Explorer Directory & Access Control'}
+                {inlineKpiView === 'trips' && 'Active Travel Itineraries & Trips'}
+                {inlineKpiView === 'destinations' && 'Curated Destinations Catalog'}
+                {inlineKpiView === 'activities' && 'Booked Activities & Tours Catalog'}
+              </h2>
+              <p className="card-subtext">
+                {inlineKpiView === 'users' && 'Click any user row to open full identity dossier & manage access.'}
+                {inlineKpiView === 'trips' && 'Click any trip to view its live day-wise itinerary & schedule.'}
+                {inlineKpiView === 'destinations' && 'Click any city to plan customized trips with cost indices in Rupees.'}
+                {inlineKpiView === 'activities' && 'Click any activity to view duration, cost in Rupees, and schedule.'}
+              </p>
             </div>
           </div>
-          <div className="search-bar-inline">
-            <Search size={18} className="search-icon-inside" />
-            <input 
-              type="text" 
-              placeholder="Search by name, email, or username..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="admin-search-input"
-            />
+
+          {/* Quick Tab Switcher */}
+          <div className="admin-category-tabs">
+            <button 
+              className={`cat-tab-btn ${inlineKpiView === 'users' ? 'active' : ''}`}
+              onClick={() => setInlineKpiView('users')}
+            >
+              <Users size={15} className="mr-1"/> Users ({users.length})
+            </button>
+            <button 
+              className={`cat-tab-btn ${inlineKpiView === 'trips' ? 'active' : ''}`}
+              onClick={() => setInlineKpiView('trips')}
+            >
+              <Compass size={15} className="mr-1"/> Trips ({allTrips.length})
+            </button>
+            <button 
+              className={`cat-tab-btn ${inlineKpiView === 'destinations' ? 'active' : ''}`}
+              onClick={() => setInlineKpiView('destinations')}
+            >
+              <MapPin size={15} className="mr-1"/> Cities ({popularCities.length})
+            </button>
+            <button 
+              className={`cat-tab-btn ${inlineKpiView === 'activities' ? 'active' : ''}`}
+              onClick={() => setInlineKpiView('activities')}
+            >
+              <Activity size={15} className="mr-1"/> Activities ({allActivities.length})
+            </button>
           </div>
         </div>
 
-        <div className="table-responsive">
-          <table className="admin-data-table">
-            <thead>
-              <tr>
-                <th>Explorer Identity</th>
-                <th>Email Address</th>
-                <th>Role</th>
-                <th>Trips</th>
-                <th>Joined</th>
-                <th>Status & Access Control</th>
-                <th className="text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.length > 0 ? (
-                users.map(u => {
-                  const isSelf = u.id === currentUser?.id;
-                  const isSuper = u.is_superuser;
-                  return (
-                    <tr 
-                      key={u.id} 
-                      className={`clickable-table-row ${!u.is_active ? 'row-suspended' : ''}`}
-                      onClick={() => setSelectedUserDetail(u)}
-                      title={`Click to inspect identity of ${u.full_name}`}
-                    >
-                      <td>
-                        <div className="user-cell">
-                          <div className="user-avatar-sm">
-                            {u.full_name.charAt(0).toUpperCase() || u.username.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <div className="user-name-text user-name-link">
-                              {u.full_name} {isSelf && <span className="self-tag">(You)</span>}
-                            </div>
-                            <div className="user-username-sub">@{u.username}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="email-cell">{u.email}</td>
-                      <td>
-                        {isSuper ? (
-                          <span className="badge-role superuser"><Shield size={12} className="mr-1" /> Superuser</span>
-                        ) : u.is_staff ? (
-                          <span className="badge-role staff"><ShieldCheck size={12} className="mr-1" /> Staff Admin</span>
-                        ) : (
-                          <span className="badge-role traveler">Traveler</span>
-                        )}
-                      </td>
-                      <td>
-                        <span className="trips-count-pill clickable-pill" title="Click to view user trips">
-                          {u.trips_count} {u.trips_count === 1 ? 'trip' : 'trips'}
-                        </span>
-                      </td>
-                      <td className="date-cell">{u.date_joined}</td>
-                      <td onClick={(e) => e.stopPropagation()}>
-                        {!isSelf ? (
-                          <button
-                            type="button"
-                            className={`access-control-pill-btn ${u.is_active ? 'status-active' : 'status-suspended'}`}
-                            onClick={() => handleToggleStatus(u)}
-                            disabled={actionLoading}
-                            title={u.is_active ? "Click to Suspend Account Access" : "Click to Activate Account Access"}
-                          >
-                            <span className="dot"></span>
-                            <span>{u.is_active ? 'Active (Click to Suspend)' : 'Suspended (Click to Activate)'}</span>
-                          </button>
-                        ) : (
-                          <span className="status-indicator-pill active">
-                            <span className="dot"></span> Active (You)
-                          </span>
-                        )}
-                      </td>
-                      <td className="text-right actions-cell" onClick={(e) => e.stopPropagation()}>
-                        <div className="action-buttons-group">
-                          <Button 
-                            variant="primary" 
-                            size="sm" 
-                            className="btn-inspect-identity"
-                            onClick={() => setSelectedUserDetail(u)}
-                            title="Inspect User Identity Dossier"
-                          >
-                            <Eye size={14} className="mr-1" /> Details
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan="7" className="text-center empty-table-msg">
-                    No users matching "{searchQuery}" were found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        {/* Search Bar for active list */}
+        <div className="search-bar-inline mt-3 mb-3">
+          <Search size={18} className="search-icon-inside" />
+          <input 
+            type="text" 
+            placeholder={
+              inlineKpiView === 'users' ? "Search users by name, email, or username..." :
+              inlineKpiView === 'trips' ? "Search trips by title or creator..." :
+              inlineKpiView === 'destinations' ? "Search destinations by city or country..." :
+              "Search activities by title or category..."
+            }
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="admin-search-input"
+          />
         </div>
+
+        {/* 1. USERS LIST VIEW */}
+        {inlineKpiView === 'users' && (
+          <div className="table-responsive">
+            <table className="admin-data-table">
+              <thead>
+                <tr>
+                  <th>Explorer Identity</th>
+                  <th>Email Address</th>
+                  <th>Role</th>
+                  <th>Trips</th>
+                  <th>Joined</th>
+                  <th>Status & Access Control</th>
+                  <th className="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.filter(u => !searchQuery || u.full_name.toLowerCase().includes(searchQuery.toLowerCase()) || u.email.toLowerCase().includes(searchQuery.toLowerCase()) || u.username.toLowerCase().includes(searchQuery.toLowerCase())).length > 0 ? (
+                  users
+                    .filter(u => !searchQuery || u.full_name.toLowerCase().includes(searchQuery.toLowerCase()) || u.email.toLowerCase().includes(searchQuery.toLowerCase()) || u.username.toLowerCase().includes(searchQuery.toLowerCase()))
+                    .map(u => {
+                      const isSelf = u.id === currentUser?.id;
+                      const isSuper = u.is_superuser;
+                      return (
+                        <tr 
+                          key={u.id} 
+                          className={`clickable-table-row ${!u.is_active ? 'row-suspended' : ''}`}
+                          onClick={() => setSelectedUserDetail(u)}
+                          title={`Click to inspect identity of ${u.full_name}`}
+                        >
+                          <td>
+                            <div className="user-cell">
+                              <div className="user-avatar-sm">
+                                {u.full_name.charAt(0).toUpperCase() || u.username.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <div className="user-name-text user-name-link">
+                                  {u.full_name} {isSelf && <span className="self-tag">(You)</span>}
+                                </div>
+                                <div className="user-username-sub">@{u.username}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="email-cell">{u.email}</td>
+                          <td>
+                            {isSuper ? (
+                              <span className="badge-role superuser"><Shield size={12} className="mr-1" /> Superuser</span>
+                            ) : u.is_staff ? (
+                              <span className="badge-role staff"><ShieldCheck size={12} className="mr-1" /> Staff Admin</span>
+                            ) : (
+                              <span className="badge-role traveler">Traveler</span>
+                            )}
+                          </td>
+                          <td>
+                            <span className="trips-count-pill clickable-pill" title="Click to view user trips">
+                              {u.trips_count} {u.trips_count === 1 ? 'trip' : 'trips'}
+                            </span>
+                          </td>
+                          <td className="date-cell">{u.date_joined}</td>
+                          <td onClick={(e) => e.stopPropagation()}>
+                            {!isSelf ? (
+                              <button
+                                type="button"
+                                className={`access-control-pill-btn ${u.is_active ? 'status-active' : 'status-suspended'}`}
+                                onClick={() => handleToggleStatus(u)}
+                                disabled={actionLoading}
+                                title={u.is_active ? "Click to Suspend Account Access" : "Click to Activate Account Access"}
+                              >
+                                <span className="dot"></span>
+                                <span>{u.is_active ? 'Active (Click to Suspend)' : 'Suspended (Click to Activate)'}</span>
+                              </button>
+                            ) : (
+                              <span className="status-indicator-pill active">
+                                <span className="dot"></span> Active (You)
+                              </span>
+                            )}
+                          </td>
+                          <td className="text-right actions-cell" onClick={(e) => e.stopPropagation()}>
+                            <div className="action-buttons-group">
+                              <Button 
+                                variant="primary" 
+                                size="sm" 
+                                className="btn-inspect-identity"
+                                onClick={() => setSelectedUserDetail(u)}
+                                title="Inspect User Identity Dossier"
+                              >
+                                <Eye size={14} className="mr-1" /> Details
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="text-center empty-table-msg">
+                      No users matching "{searchQuery}" were found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* 2. TRIPS LIST VIEW */}
+        {inlineKpiView === 'trips' && (
+          <div className="table-responsive">
+            <table className="admin-data-table">
+              <thead>
+                <tr>
+                  <th>Trip Title</th>
+                  <th>Explorer Creator</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Stops</th>
+                  <th>Status</th>
+                  <th className="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allTrips.filter(t => !searchQuery || t.name.toLowerCase().includes(searchQuery.toLowerCase()) || t.user_name.toLowerCase().includes(searchQuery.toLowerCase())).map(t => (
+                  <tr key={t.id} className="clickable-table-row" onClick={() => navigate(`/trip/${t.id}/view`)}>
+                    <td className="font-semibold text-primary-brand">{t.name}</td>
+                    <td>{t.user_name}</td>
+                    <td>{t.start_date}</td>
+                    <td>{t.end_date}</td>
+                    <td><span className="trips-count-pill">{t.stops_count} stops</span></td>
+                    <td><span className="badge-role traveler">{t.is_public ? 'Public' : 'Private'}</span></td>
+                    <td className="text-right">
+                      <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/trip/${t.id}/view`); }}>
+                        View Itinerary →
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* 3. DESTINATIONS LIST VIEW */}
+        {inlineKpiView === 'destinations' && (
+          <div className="kpi-cities-grid p-3">
+            {popularCities.filter(c => !searchQuery || c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.country.toLowerCase().includes(searchQuery.toLowerCase())).map(c => (
+              <div 
+                key={c.id} 
+                className="destination-chip clickable-chip p-3 glass"
+                onClick={() => navigate('/search/city', { state: { initialSearch: c.name } })}
+              >
+                <div className="chip-icon"><MapPin size={20} /></div>
+                <div className="chip-info flex-1">
+                  <h4 className="m-0 font-bold">{c.name}</h4>
+                  <span className="text-secondary text-sm">{c.country} • Popularity: {c.popularity}</span>
+                </div>
+                <span className="chip-cost font-semibold text-success">{formatCityCost(c.cost_index)}</span>
+                <Button size="sm" variant="primary" className="ml-2">Plan Trip →</Button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 4. ACTIVITIES LIST VIEW */}
+        {inlineKpiView === 'activities' && (
+          <div className="kpi-activities-grid p-3">
+            {allActivities.filter(a => !searchQuery || a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.type.toLowerCase().includes(searchQuery.toLowerCase())).map(a => (
+              <div 
+                key={a.id} 
+                className="destination-chip clickable-chip p-3 glass"
+                onClick={() => navigate('/search/activity')}
+              >
+                <div className="chip-icon"><Activity size={20} /></div>
+                <div className="chip-info flex-1">
+                  <h4 className="m-0 font-bold">{a.name}</h4>
+                  <span className="text-secondary text-sm">Category: {a.type} • Duration: {a.duration_hours} hrs</span>
+                </div>
+                <span className="chip-cost font-semibold text-success">
+                  {a.cost.toString().includes('Rupees') ? a.cost : a.cost === 'Free' ? 'Free' : `${a.cost} Rupees`}
+                </span>
+                <Button size="sm" variant="outline" className="ml-2">View Activity →</Button>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
+
 
       {/* KPI Detail Inspection Modal (Users / Trips / Destinations / Activities) */}
       {activeKpiModal && (

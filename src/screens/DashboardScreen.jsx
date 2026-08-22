@@ -57,11 +57,11 @@ export const DashboardScreen = () => {
   };
 
   const regionalSelections = [
-    { name: 'Goa', country: 'India', cost: '₹15,000/trip', image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800&q=80' },
-    { name: 'Jaipur', country: 'India', cost: '₹12,000/trip', image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&q=80' },
-    { name: 'Kerala', country: 'India', cost: '₹20,000/trip', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&q=80' },
-    { name: 'Bali', country: 'Indonesia', cost: '₹40,000/trip', image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80' },
-    { name: 'Dubai', country: 'UAE', cost: '₹55,000/trip', image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80' },
+    { name: 'Goa', country: 'India', cost: '15,000 Rupees / trip', image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800&q=80' },
+    { name: 'Jaipur', country: 'India', cost: '12,000 Rupees / trip', image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800&q=80' },
+    { name: 'Kerala', country: 'India', cost: '20,000 Rupees / trip', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800&q=80' },
+    { name: 'Bali', country: 'Indonesia', cost: '40,000 Rupees / trip', image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80' },
+    { name: 'Dubai', country: 'UAE', cost: '55,000 Rupees / trip', image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80' },
   ];
 
   return (
