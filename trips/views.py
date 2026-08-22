@@ -92,4 +92,14 @@ class AssignActivityView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class ItineraryDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, trip_id):
+        trip = get_object_or_404(Trip, id=trip_id, user=request.user)
+        serializer = TripDetailSerializer(trip)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
 

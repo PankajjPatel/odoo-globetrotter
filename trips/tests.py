@@ -38,7 +38,7 @@ class TripSerializerTestCase(TestCase):
         )
         serializer = TripDetailSerializer(instance=trip)
         expected_fields = {
-            'id', 'name', 'description', 'start_date', 'end_date', 'cover_photo', 'is_public', 'share_uuid'
+            'id', 'name', 'description', 'start_date', 'end_date', 'cover_photo', 'is_public', 'share_uuid', 'stops'
         }
         self.assertEqual(set(serializer.data.keys()), expected_fields)
 
@@ -96,7 +96,7 @@ class TripAPIViewSetTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_fields = {
-            'id', 'name', 'description', 'start_date', 'end_date', 'cover_photo', 'is_public', 'share_uuid'
+            'id', 'name', 'description', 'start_date', 'end_date', 'cover_photo', 'is_public', 'share_uuid', 'stops'
         }
         self.assertEqual(set(response.data.keys()), expected_fields)
 
@@ -319,4 +319,36 @@ class TripAPIViewSetTestCase(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(TripActivity.objects.filter(id=trip_activity.id).exists())
+
+    def test_itinerary_detail_success(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        trip_activity = TripActivity.objects.create(
+            stop=stop,
+            activity=self.activity1,
+            cost_override=12.50
+        )
+        url = reverse('itinerary-detail', kwargs={'trip_id': self.trip1.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], self.trip1.id)
+        self.assertEqual(response.data['name'], self.trip1.name)
+        self.assertEqual(len(response.data['stops']), 1)
+        self.assertEqual(response.data['stops'][0]['id'], stop.id)
+        self.assertEqual(response.data['stops'][0]['city_detail']['name'], "Paris")
+        self.assertEqual(len(response.data['stops'][0]['activities']), 1)
+        self.assertEqual(response.data['stops'][0]['activities'][0]['activity_detail']['name'], "Eiffel Tower Tour")
+
+    def test_itinerary_detail_other_user_trip_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('itinerary-detail', kwargs={'trip_id': self.trip2.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 

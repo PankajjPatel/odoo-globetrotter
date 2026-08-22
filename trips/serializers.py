@@ -47,19 +47,7 @@ class TripCreateUpdateSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class TripDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Trip
-        fields = [
-            'id',
-            'name',
-            'description',
-            'start_date',
-            'end_date',
-            'cover_photo',
-            'is_public',
-            'share_uuid',
-        ]
+# TripDetailSerializer moved to the end of the file to prevent NameError on StopSerializer
 
 
 class CityMiniSerializer(serializers.ModelSerializer):
@@ -114,3 +102,19 @@ class StopSerializer(serializers.ModelSerializer):
 
 
 
+class TripDetailSerializer(serializers.ModelSerializer):
+    stops = StopSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Trip
+        fields = [
+            'id',
+            'name',
+            'description',
+            'start_date',
+            'end_date',
+            'cover_photo',
+            'is_public',
+            'share_uuid',
+            'stops',
+        ]
