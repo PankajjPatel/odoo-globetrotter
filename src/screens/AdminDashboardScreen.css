@@ -1,0 +1,131 @@
+.admin-container {
+  padding-bottom: var(--spacing-xl);
+}
+
+.admin-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.admin-header h1 {
+  font-size: 2.5rem;
+  color: var(--secondary-color);
+  margin-bottom: 0.25rem;
+}
+
+.admin-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+@media (max-width: 768px) {
+  .admin-stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg) !important;
+}
+
+.admin-stat-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.admin-stat-label {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.admin-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+@media (max-width: 900px) {
+  .admin-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--spacing-sm);
+}
+
+.card-header-flex h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--secondary-color);
+}
+
+.chart-wrapper {
+  width: 100%;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.admin-table td {
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background-color: rgba(42, 157, 143, 0.1);
+  color: var(--success);
+}
+
+.status-badge.inactive {
+  background-color: rgba(230, 57, 70, 0.1);
+  color: var(--danger);
+}
