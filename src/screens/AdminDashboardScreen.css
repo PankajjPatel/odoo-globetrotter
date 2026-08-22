@@ -928,3 +928,186 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* CSV Export Header Toolbar */
+.admin-header-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.csv-export-dropdown-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #ffffff;
+  padding: 0.35rem 0.5rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+.csv-export-btn {
+  display: inline-flex;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.csv-export-btn:hover {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.csv-export-btn.users:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.csv-export-btn.trips:hover {
+  background: #ea580c;
+  border-color: #ea580c;
+}
+
+.csv-export-btn.destinations:hover {
+  background: #059669;
+  border-color: #059669;
+}
+
+.csv-export-btn.activities:hover {
+  background: #7c3aed;
+  border-color: #7c3aed;
+}
+
+/* Access Control Interactive Pill */
+.access-control-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.access-control-pill-btn.status-active {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.access-control-pill-btn.status-active:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.access-control-pill-btn.status-suspended {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.access-control-pill-btn.status-suspended:hover {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.access-control-pill-btn .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.btn-inspect-identity {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 0.8rem !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15) !important;
+}
+
+.btn-inspect-identity:hover {
+  background: linear-gradient(135deg, #1e293b 0%, #475569 100%) !important;
+  transform: translateY(-1px);
+}
+
+.clickable-chip {
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.clickable-chip:hover {
+  border-color: #2563eb;
+  background: #f0f7ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+/* User Dossier Trips List */
+.user-modal-trips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.user-trip-item-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.user-trip-item-preview:hover {
+  background: #ffffff;
+  border-color: #f97316;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.1);
+}
+
+.preview-trip-title {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.preview-trip-dates {
+  display: block;
+  font-size: 0.76rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+}
+
+.btn-open-trip {
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  color: #ea580c !important;
+  padding: 0.35rem 0.65rem !important;
+}
+
+.btn-access-toggle-action {
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+}

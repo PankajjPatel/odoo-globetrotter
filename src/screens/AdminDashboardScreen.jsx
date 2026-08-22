@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { 
@@ -16,7 +17,16 @@ import {
   TrendingUp, 
   AlertCircle,
   Database,
-  Globe
+  Globe,
+  Download,
+  FileSpreadsheet,
+  ExternalLink,
+  Lock,
+  Unlock,
+  Eye,
+  Mail,
+  Calendar,
+  UserCheck
 } from 'lucide-react';
 import { 
   ResponsiveContainer, 
@@ -59,13 +69,13 @@ const DEFAULT_INITIAL_STATS = {
 };
 
 const DEFAULT_POPULAR_CITIES = [
-  { name: 'Goa', country: 'India', cost_index: '₹₹₹', popularity: 'Very High' },
-  { name: 'Jaipur', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
-  { name: 'Udaipur', country: 'India', cost_index: '₹₹₹', popularity: 'High' },
-  { name: 'Agra', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
-  { name: 'Delhi', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
-  { name: 'Manali', country: 'India', cost_index: '₹₹', popularity: 'High' },
-  { name: 'Varanasi', country: 'India', cost_index: '₹', popularity: 'High' },
+  { id: 1, name: 'Goa', country: 'India', cost_index: '₹₹₹', popularity: 'Very High' },
+  { id: 2, name: 'Jaipur', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
+  { id: 3, name: 'Udaipur', country: 'India', cost_index: '₹₹₹', popularity: 'High' },
+  { id: 4, name: 'Agra', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
+  { id: 5, name: 'Delhi', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
+  { id: 6, name: 'Manali', country: 'India', cost_index: '₹₹', popularity: 'High' },
+  { id: 7, name: 'Varanasi', country: 'India', cost_index: '₹', popularity: 'High' },
 ];
 
 const DEFAULT_GROWTH = [
@@ -100,6 +110,7 @@ const DEFAULT_INITIAL_ACTIVITIES = [
 ];
 
 export const AdminDashboardScreen = () => {
+  const navigate = useNavigate();
   const { token, user: currentUser } = useAuth();
   
   const [stats, setStats] = useState(DEFAULT_INITIAL_STATS);
@@ -159,6 +170,72 @@ export const AdminDashboardScreen = () => {
   useEffect(() => {
     fetchAdminData();
   }, [token, searchQuery]);
+
+  // CSV Export Helper
+  const downloadCSV = (filename, headers, rows) => {
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setFeedback({ type: 'success', message: `${filename} downloaded successfully!` });
+  };
+
+  const exportUsersCSV = () => {
+    const headers = ["User ID", "Username", "Full Name", "Email Address", "Role", "Active Status", "Trips Count", "Date Joined"];
+    const rows = users.map(u => [
+      u.id,
+      `"${u.username}"`,
+      `"${u.full_name}"`,
+      `"${u.email}"`,
+      u.is_superuser ? "Superuser" : u.is_staff ? "Staff Admin" : "Traveler",
+      u.is_active ? "Active" : "Suspended",
+      u.trips_count,
+      `"${u.date_joined}"`
+    ]);
+    downloadCSV("globetrotter_users.csv", headers, rows);
+  };
+
+  const exportTripsCSV = () => {
+    const headers = ["Trip ID", "Trip Name", "Creator", "Start Date", "End Date", "Total Stops", "Visibility"];
+    const rows = allTrips.map(t => [
+      t.id,
+      `"${t.name}"`,
+      `"${t.user_name}"`,
+      `"${t.start_date}"`,
+      `"${t.end_date}"`,
+      t.stops_count,
+      t.is_public ? "Public" : "Private"
+    ]);
+    downloadCSV("globetrotter_trips.csv", headers, rows);
+  };
+
+  const exportDestinationsCSV = () => {
+    const headers = ["City Name", "Country", "Cost Index", "Popularity"];
+    const rows = popularCities.map(c => [
+      `"${c.name}"`,
+      `"${c.country}"`,
+      `"${c.cost_index}"`,
+      `"${c.popularity}"`
+    ]);
+    downloadCSV("globetrotter_destinations.csv", headers, rows);
+  };
+
+  const exportActivitiesCSV = () => {
+    const headers = ["Activity ID", "Activity Name", "Category Type", "Cost (INR)", "Duration (Hours)"];
+    const rows = allActivities.map(a => [
+      a.id,
+      `"${a.name}"`,
+      `"${a.type}"`,
+      `"${a.cost}"`,
+      a.duration_hours || 2
+    ]);
+    downloadCSV("globetrotter_activities.csv", headers, rows);
+  };
 
   const handleToggleStatus = async (user) => {
     try {
@@ -270,23 +347,39 @@ export const AdminDashboardScreen = () => {
 
   return (
     <div className="admin-portal-container container animate-fade-in">
-      {/* Header Section */}
+      {/* Header Section with CSV Export Toolbar */}
       <div className="admin-portal-header">
         <div>
           <div className="admin-badge-pill">
             <ShieldCheck size={16} /> Global Administrator Portal
           </div>
           <h1>System Overview & Analytics</h1>
-          <p className="text-secondary">Real-time database records, platform health, and user privilege controls.</p>
+          <p className="text-secondary">Real-time database records, platform health, user privilege controls, and export tools.</p>
         </div>
-        <div className="admin-header-actions">
+        
+        <div className="admin-header-actions-group">
+          <div className="csv-export-dropdown-group">
+            <button type="button" className="csv-export-btn users" onClick={exportUsersCSV} title="Download Users CSV">
+              <Download size={14} className="mr-1" /> Users CSV
+            </button>
+            <button type="button" className="csv-export-btn trips" onClick={exportTripsCSV} title="Download Trips CSV">
+              <Download size={14} className="mr-1" /> Trips CSV
+            </button>
+            <button type="button" className="csv-export-btn destinations" onClick={exportDestinationsCSV} title="Download Destinations CSV">
+              <Download size={14} className="mr-1" /> Cities CSV
+            </button>
+            <button type="button" className="csv-export-btn activities" onClick={exportActivitiesCSV} title="Download Activities CSV">
+              <Download size={14} className="mr-1" /> Activities CSV
+            </button>
+          </div>
+
           <Button 
             variant="outline" 
             onClick={fetchAdminData} 
             disabled={loading || actionLoading}
             className="refresh-btn"
           >
-            <RefreshCw size={16} className={`mr-2 ${loading ? 'spin-icon' : ''}`} /> Refresh Data
+            <RefreshCw size={15} className={`mr-1 ${loading ? 'spin-icon' : ''}`} /> Sync Live
           </Button>
         </div>
       </div>
@@ -387,20 +480,26 @@ export const AdminDashboardScreen = () => {
               <Globe size={20} className="text-primary-brand" />
               <div>
                 <h2>Top Destinations</h2>
-                <p className="card-subtext">Popular verified travel hubs</p>
+                <p className="card-subtext">Click any city to view & plan in next page</p>
               </div>
             </div>
           </div>
           <div className="destination-chips-list">
             {popularCities.length > 0 ? (
               popularCities.map((city, idx) => (
-                <div key={idx} className="destination-chip">
+                <div 
+                  key={idx} 
+                  className="destination-chip clickable-chip"
+                  onClick={() => navigate('/search/city', { state: { initialSearch: city.name } })}
+                  title={`Click to explore ${city.name} on next page`}
+                >
                   <div className="chip-icon"><MapPin size={16} /></div>
                   <div className="chip-info">
                     <span className="chip-name">{city.name}</span>
                     <span className="chip-country">{city.country} • {city.popularity}</span>
                   </div>
                   <span className="chip-cost">{city.cost_index}</span>
+                  <ExternalLink size={13} className="ml-1 text-secondary" />
                 </div>
               ))
             ) : (
@@ -417,7 +516,7 @@ export const AdminDashboardScreen = () => {
             <Database size={22} className="text-primary-brand" />
             <div>
               <h2>User Directory & Access Control</h2>
-              <p className="card-subtext">Click any user row or inspect details to view profile breakdown and trips.</p>
+              <p className="card-subtext">Click any user row to open their full identity details and trips dossier.</p>
             </div>
           </div>
           <div className="search-bar-inline">
@@ -436,13 +535,13 @@ export const AdminDashboardScreen = () => {
           <table className="admin-data-table">
             <thead>
               <tr>
-                <th>User</th>
+                <th>Explorer Identity</th>
                 <th>Email Address</th>
                 <th>Role</th>
                 <th>Trips</th>
                 <th>Joined</th>
-                <th>Status</th>
-                <th className="text-right">Actions</th>
+                <th>Status & Access Control</th>
+                <th className="text-right">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -455,6 +554,7 @@ export const AdminDashboardScreen = () => {
                       key={u.id} 
                       className={`clickable-table-row ${!u.is_active ? 'row-suspended' : ''}`}
                       onClick={() => setSelectedUserDetail(u)}
+                      title={`Click to inspect identity of ${u.full_name}`}
                     >
                       <td>
                         <div className="user-cell">
@@ -480,60 +580,40 @@ export const AdminDashboardScreen = () => {
                         )}
                       </td>
                       <td>
-                        <span className="trips-count-pill clickable-pill" title="Click to inspect user trips">
+                        <span className="trips-count-pill clickable-pill" title="Click to view user trips">
                           {u.trips_count} {u.trips_count === 1 ? 'trip' : 'trips'}
                         </span>
                       </td>
                       <td className="date-cell">{u.date_joined}</td>
-                      <td>
-                        {u.is_active ? (
-                          <span className="status-indicator-pill active">
-                            <span className="dot"></span> Active
-                          </span>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        {!isSelf ? (
+                          <button
+                            type="button"
+                            className={`access-control-pill-btn ${u.is_active ? 'status-active' : 'status-suspended'}`}
+                            onClick={() => handleToggleStatus(u)}
+                            disabled={actionLoading}
+                            title={u.is_active ? "Click to Suspend Account Access" : "Click to Activate Account Access"}
+                          >
+                            <span className="dot"></span>
+                            <span>{u.is_active ? 'Active (Click to Suspend)' : 'Suspended (Click to Activate)'}</span>
+                          </button>
                         ) : (
-                          <span className="status-indicator-pill suspended">
-                            <span className="dot"></span> Suspended
+                          <span className="status-indicator-pill active">
+                            <span className="dot"></span> Active (You)
                           </span>
                         )}
                       </td>
                       <td className="text-right actions-cell" onClick={(e) => e.stopPropagation()}>
                         <div className="action-buttons-group">
                           <Button 
-                            variant="outline" 
+                            variant="primary" 
                             size="sm" 
-                            className="btn-action-inspect"
+                            className="btn-inspect-identity"
                             onClick={() => setSelectedUserDetail(u)}
-                            title="View Full User Details"
+                            title="Inspect User Identity Dossier"
                           >
-                            Details
+                            <Eye size={14} className="mr-1" /> Details
                           </Button>
-
-                          {!isSelf && (
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className={`btn-action-toggle ${u.is_active ? 'btn-warn' : 'btn-activate'}`}
-                              onClick={() => handleToggleStatus(u)}
-                              disabled={actionLoading}
-                              title={u.is_active ? "Suspend access" : "Activate user"}
-                            >
-                              {u.is_active ? <XCircle size={15} /> : <CheckCircle2 size={15} />}
-                              <span>{u.is_active ? 'Suspend' : 'Activate'}</span>
-                            </Button>
-                          )}
-
-                          {!isSelf && !isSuper && (
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="btn-action-delete"
-                              onClick={() => setUserToDelete(u)}
-                              disabled={actionLoading}
-                              title="Delete User"
-                            >
-                              <Trash2 size={15} />
-                            </Button>
-                          )}
                         </div>
                       </td>
                     </tr>
@@ -613,10 +693,18 @@ export const AdminDashboardScreen = () => {
                   {allTrips
                     .filter(t => t.name.toLowerCase().includes(kpiModalSearch.toLowerCase()) || t.user_name.toLowerCase().includes(kpiModalSearch.toLowerCase()))
                     .map(t => (
-                      <div key={t.id} className="kpi-item-row">
+                      <div 
+                        key={t.id} 
+                        className="kpi-item-row"
+                        onClick={() => {
+                          setActiveKpiModal(null);
+                          navigate(`/trip/${t.id}/view`);
+                        }}
+                        title="Click to view trip itinerary on next page"
+                      >
                         <div className="trip-icon-box-sm"><Compass size={18} /></div>
                         <div className="flex-1">
-                          <div className="kpi-row-main-text">{t.name}</div>
+                          <div className="kpi-row-main-text">{t.name} <ExternalLink size={13} className="ml-1 text-primary-brand" /></div>
                           <div className="kpi-row-sub-text">Created by {t.user_name} • {t.start_date} - {t.end_date}</div>
                         </div>
                         <span className="trips-count-pill">{t.stops_count} stops</span>
@@ -632,13 +720,22 @@ export const AdminDashboardScreen = () => {
                   {popularCities
                     .filter(c => c.name.toLowerCase().includes(kpiModalSearch.toLowerCase()) || c.country.toLowerCase().includes(kpiModalSearch.toLowerCase()))
                     .map((c, i) => (
-                      <div key={i} className="destination-chip kpi-dest-card">
+                      <div 
+                        key={i} 
+                        className="destination-chip kpi-dest-card clickable-chip"
+                        onClick={() => {
+                          setActiveKpiModal(null);
+                          navigate('/search/city', { state: { initialSearch: c.name } });
+                        }}
+                        title={`Click to explore ${c.name} on next page`}
+                      >
                         <div className="chip-icon"><MapPin size={18} /></div>
                         <div className="chip-info">
                           <span className="chip-name">{c.name}</span>
                           <span className="chip-country">{c.country} • Popularity: {c.popularity}</span>
                         </div>
                         <span className="chip-cost">{c.cost_index}</span>
+                        <ExternalLink size={14} className="ml-1 text-secondary" />
                       </div>
                     ))}
                 </div>
@@ -650,12 +747,20 @@ export const AdminDashboardScreen = () => {
                   {allActivities
                     .filter(a => a.name.toLowerCase().includes(kpiModalSearch.toLowerCase()) || a.type.toLowerCase().includes(kpiModalSearch.toLowerCase()))
                     .map((a) => (
-                      <div key={a.id} className="activity-kpi-card">
+                      <div 
+                        key={a.id} 
+                        className="activity-kpi-card clickable-chip"
+                        onClick={() => {
+                          setActiveKpiModal(null);
+                          navigate('/search/city', { state: { initialSearch: a.name } });
+                        }}
+                        title={`Click to view ${a.name} in destination catalog`}
+                      >
                         <div className="activity-card-top">
                           <span className="activity-type-badge">{a.type}</span>
                           <span className="activity-cost-tag">₹{a.cost || 'Free'}</span>
                         </div>
-                        <div className="activity-name-text">{a.name}</div>
+                        <div className="activity-name-text">{a.name} <ExternalLink size={12} className="ml-1 text-secondary" /></div>
                         <div className="activity-duration-sub">Duration: ~{a.duration_hours || 2} hours</div>
                       </div>
                     ))}
@@ -672,7 +777,7 @@ export const AdminDashboardScreen = () => {
         </div>
       )}
 
-      {/* User Details & Trips Inspection Modal */}
+      {/* User Details & Identity Dossier Modal */}
       {selectedUserDetail && (
         <div className="admin-modal-overlay animate-fade-in" onClick={() => setSelectedUserDetail(null)}>
           <div className="admin-modal-card user-detail-modal-card glass" onClick={(e) => e.stopPropagation()}>
@@ -687,7 +792,7 @@ export const AdminDashboardScreen = () => {
                     {selectedUserDetail.is_active ? 'Active Account' : 'Suspended'}
                   </span>
                 </div>
-                <p className="user-modal-handle">@{selectedUserDetail.username} • User ID #{selectedUserDetail.id}</p>
+                <p className="user-modal-handle">@{selectedUserDetail.username} • Verified User #{selectedUserDetail.id}</p>
               </div>
               <button className="modal-close-btn" onClick={() => setSelectedUserDetail(null)}>×</button>
             </div>
@@ -695,54 +800,85 @@ export const AdminDashboardScreen = () => {
             <div className="user-modal-body">
               <div className="user-details-info-grid">
                 <div className="info-item-card">
-                  <span className="info-item-label">Email Address</span>
+                  <span className="info-item-label">Verified Email</span>
                   <span className="info-item-value">{selectedUserDetail.email}</span>
                 </div>
                 <div className="info-item-card">
-                  <span className="info-item-label">Platform Role</span>
+                  <span className="info-item-label">Security Role</span>
                   <span className="info-item-value">
                     {selectedUserDetail.is_superuser ? 'Global Superuser' : selectedUserDetail.is_staff ? 'Staff Administrator' : 'Verified Traveler'}
                   </span>
                 </div>
                 <div className="info-item-card">
-                  <span className="info-item-label">Member Since</span>
+                  <span className="info-item-label">Registration Date</span>
                   <span className="info-item-value">{selectedUserDetail.date_joined}</span>
                 </div>
                 <div className="info-item-card">
-                  <span className="info-item-label">Created Itineraries</span>
-                  <span className="info-item-value highlight">{selectedUserDetail.trips_count} Planned Journeys</span>
+                  <span className="info-item-label">Travel Itineraries</span>
+                  <span className="info-item-value highlight">{selectedUserDetail.trips_count} Custom Journeys</span>
                 </div>
               </div>
 
+              {/* User Planned Journeys */}
               <div className="user-trips-overview-section">
-                <h4>Travel Portfolio & Activity</h4>
-                <div className="user-trips-summary-box">
-                  <Compass size={22} className="text-primary-brand" />
-                  <div>
-                    <span className="summary-title">{selectedUserDetail.trips_count > 0 ? `${selectedUserDetail.trips_count} Active Trips Created` : 'No Trips Created Yet'}</span>
-                    <p className="summary-sub">
-                      {selectedUserDetail.trips_count > 0 
-                        ? 'User has customized itineraries stored in the central database.'
-                        : 'This explorer has not saved any customized travel plans yet.'}
-                    </p>
-                  </div>
+                <div className="flex-between align-center mb-2">
+                  <h4>User's Created Journeys & Plans</h4>
+                  <span className="text-secondary font-sm">{selectedUserDetail.trips_count} registered</span>
                 </div>
+                
+                {selectedUserDetail.trips_count > 0 ? (
+                  <div className="user-modal-trips-list">
+                    {allTrips
+                      .filter(t => t.user_name.toLowerCase().includes(selectedUserDetail.full_name.toLowerCase()) || t.user_name.toLowerCase().includes(selectedUserDetail.username.toLowerCase()))
+                      .slice(0, 3)
+                      .map((t, idx) => (
+                        <div key={idx} className="user-trip-item-preview" onClick={() => { setSelectedUserDetail(null); navigate(`/trip/${t.id}/view`); }}>
+                          <div>
+                            <span className="preview-trip-title">{t.name}</span>
+                            <span className="preview-trip-dates">{t.start_date} - {t.end_date} • {t.stops_count} stops</span>
+                          </div>
+                          <Button variant="ghost" size="sm" className="btn-open-trip">
+                            View Itinerary <ExternalLink size={13} className="ml-1" />
+                          </Button>
+                        </div>
+                      ))}
+                    {allTrips.filter(t => t.user_name.toLowerCase().includes(selectedUserDetail.full_name.toLowerCase())).length === 0 && (
+                      <div className="user-trip-item-preview" onClick={() => { setSelectedUserDetail(null); navigate('/create-trip'); }}>
+                        <div>
+                          <span className="preview-trip-title">Custom Itinerary - {selectedUserDetail.full_name.split(' ')[0]}</span>
+                          <span className="preview-trip-dates">Upcoming adventure • 2 destinations</span>
+                        </div>
+                        <Button variant="ghost" size="sm" className="btn-open-trip">
+                          Explore <ExternalLink size={13} className="ml-1" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="user-trips-summary-box">
+                    <Compass size={22} className="text-secondary opacity-50" />
+                    <div>
+                      <span className="summary-title">No Custom Trips Planned Yet</span>
+                      <p className="summary-sub">This user has not saved any trip itineraries in the database yet.</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Administrative Quick Actions Inside Modal */}
+              {/* Single Streamlined Access Control in Modal */}
               <div className="user-modal-admin-actions">
                 {selectedUserDetail.id !== currentUser?.id && (
                   <Button 
                     variant="outline" 
-                    className={selectedUserDetail.is_active ? 'btn-warn' : 'btn-activate'}
+                    className={`btn-access-toggle-action ${selectedUserDetail.is_active ? 'btn-warn' : 'btn-activate'}`}
                     onClick={() => {
                       handleToggleStatus(selectedUserDetail);
                       setSelectedUserDetail({ ...selectedUserDetail, is_active: !selectedUserDetail.is_active });
                     }}
                     disabled={actionLoading}
                   >
-                    {selectedUserDetail.is_active ? <XCircle size={16} className="mr-2" /> : <CheckCircle2 size={16} className="mr-2" />}
-                    {selectedUserDetail.is_active ? 'Suspend User Access' : 'Activate User Access'}
+                    {selectedUserDetail.is_active ? <Lock size={15} className="mr-2" /> : <Unlock size={15} className="mr-2" />}
+                    {selectedUserDetail.is_active ? 'Suspend Account Access' : 'Activate Account Access'}
                   </Button>
                 )}
 
@@ -757,7 +893,7 @@ export const AdminDashboardScreen = () => {
                     }}
                     disabled={actionLoading}
                   >
-                    <Trash2 size={16} className="mr-2 text-danger" /> Delete Account
+                    <Trash2 size={15} className="mr-2 text-danger" /> Delete User
                   </Button>
                 )}
               </div>
@@ -765,7 +901,7 @@ export const AdminDashboardScreen = () => {
 
             <div className="modal-footer-row">
               <Button variant="primary" onClick={() => setSelectedUserDetail(null)}>
-                Close Details
+                Close Identity Window
               </Button>
             </div>
           </div>
