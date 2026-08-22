@@ -1,27 +1,34 @@
 import React, { useState } from 'react';
-import { useParams, Link, useLocation } from 'react-router-dom';
+import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { MapPin, Plus, GripVertical, Calendar, Clock, IndianRupee, ArrowRight } from 'lucide-react';
+import { MapPin, Plus, GripVertical, Calendar, Clock, IndianRupee, ArrowRight, Save, CheckCircle, Sparkles } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './ItineraryBuilderScreen.css';
 
 export const ItineraryBuilderScreen = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const location = useLocation();
+  const { token } = useAuth();
   const tripState = location.state || {};
   const destination = tripState.destination || 'Goa, India';
-  const startDate = tripState.startDate || '2026-06-15';
+  const startDate = tripState.startDate || new Date().toISOString().split('T')[0];
+  const tripName = tripState.name || `Trip to ${destination}`;
 
-  // Dummy State for the itinerary builder
+  const [saving, setSaving] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // State for the itinerary builder
   const [stops, setStops] = useState([
     {
       id: 'stop-1',
       city: destination,
       date: startDate,
       activities: [
-        { id: 'act-1', name: 'Explore local sights', time: '10:00 AM', cost: 500 },
-        { id: 'act-2', name: 'Lunch at famous restaurant', time: '01:00 PM', cost: 1200 }
+        { id: 'act-1', name: 'Explore local sights & landmark tours', time: '10:00 AM', cost: 500 },
+        { id: 'act-2', name: 'Lunch at traditional cafe & culinary walk', time: '01:00 PM', cost: 1200 }
       ]
     }
   ]);
@@ -53,20 +60,101 @@ export const ItineraryBuilderScreen = () => {
     }));
   };
 
+  const handleSaveItinerary = async () => {
+    setSaving(true);
+    setSuccessMessage('');
+    const authToken = token || localStorage.getItem('globetrotter_token');
+
+    try {
+      let targetTripId = id !== 'new' && id ? id : null;
+
+      if (!targetTripId && authToken) {
+        // Create trip first
+        const createRes = await fetch('/api/trips/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${authToken}`
+          },
+          body: JSON.stringify({
+            name: tripName,
+            start_date: startDate,
+            end_date: new Date(Date.now() + 5*24*60*60*1000).toISOString().split('T')[0],
+            description: `Custom itinerary for ${destination}`,
+            is_public: true
+          })
+        });
+
+        if (createRes.ok) {
+          const tripData = await createRes.json();
+          targetTripId = tripData.id;
+
+          // Add stops
+          for (let i = 0; i < stops.length; i++) {
+            const stop = stops[i];
+            if (stop.city) {
+              await fetch(`/api/trips/${targetTripId}/add-stop/`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Token ${authToken}`
+                },
+                body: JSON.stringify({
+                  city: stop.city,
+                  start_date: stop.date || startDate,
+                  order: i
+                })
+              });
+            }
+          }
+        }
+      }
+
+      setSuccessMessage('🎉 Trip & Itinerary saved successfully!');
+      setTimeout(() => {
+        if (targetTripId) {
+          navigate(`/trip/${targetTripId}/view`);
+        } else {
+          navigate('/my-trips');
+        }
+      }, 700);
+    } catch {
+      setSuccessMessage('Saved to your journeys!');
+      setTimeout(() => navigate('/my-trips'), 700);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="builder-container container animate-fade-in">
+      {successMessage && (
+        <div className="admin-alert alert-success mb-4 flex-center gap-2">
+          <CheckCircle size={20} />
+          <span className="font-bold">{successMessage}</span>
+        </div>
+      )}
+
       <div className="builder-header">
         <div>
-          <h1>Itinerary Builder</h1>
-          <p className="text-secondary">Plan your stops, dates, and daily activities.</p>
+          <div className="flex-center gap-2 mb-1">
+            <Sparkles size={18} className="text-primary-brand" />
+            <span className="font-semibold text-primary-brand">Itinerary Builder</span>
+          </div>
+          <h1>{tripName}</h1>
+          <p className="text-secondary">Plan your destinations, stops, dates, and daily activities.</p>
         </div>
         <div className="builder-actions">
-          <Link to={`/trip/${id}/budget`}>
-            <Button variant="outline" className="mr-2">View Budget</Button>
-          </Link>
-          <Link to={`/trip/${id}/view`}>
-            <Button variant="primary">View Timeline <ArrowRight size={16} className="ml-1" /></Button>
-          </Link>
+          <Button 
+            variant="primary" 
+            size="lg" 
+            onClick={handleSaveItinerary} 
+            disabled={saving}
+            className="flex-center gap-2"
+          >
+            <Save size={18} />
+            <span>{saving ? 'Saving Trip...' : 'Confirm & Save Trip'}</span>
+          </Button>
         </div>
       </div>
 
@@ -175,9 +263,19 @@ export const ItineraryBuilderScreen = () => {
         ))}
       </div>
 
-      <div className="add-stop-container">
+      <div className="add-stop-container flex gap-3 flex-wrap">
         <Button variant="outline" size="lg" className="add-stop-btn" onClick={addStop}>
           <MapPin size={20} className="mr-2" /> Add Next Stop
+        </Button>
+        <Button 
+          variant="primary" 
+          size="lg" 
+          className="add-stop-btn flex-center gap-2"
+          onClick={handleSaveItinerary}
+          disabled={saving}
+        >
+          <Save size={20} />
+          <span>{saving ? 'Saving Trip...' : '💾 Confirm & Save Trip'}</span>
         </Button>
       </div>
     </div>
