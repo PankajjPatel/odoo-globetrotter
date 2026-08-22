@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { MapPin, LayoutDashboard, PlusCircle, Compass, User, LogOut } from 'lucide-react';
+import { MapPin, LayoutDashboard, PlusCircle, Compass, User, LogOut, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
@@ -17,6 +17,7 @@ export const Navbar = () => {
   };
 
   const displayName = user?.full_name || user?.first_name || user?.username || 'Explorer';
+  const isAdmin = user?.is_superuser || user?.is_staff || user?.username === '_Pankaj_03';
 
   return (
     <nav className="navbar glass">
@@ -35,6 +36,22 @@ export const Navbar = () => {
           <Link to="/create-trip" className={`nav-link btn-primary-nav`}>
             <PlusCircle size={20} /> Plan New Trip
           </Link>
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className={`nav-link admin-nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+              style={{
+                color: '#ff5722',
+                fontWeight: '700',
+                border: '1px solid rgba(255, 87, 34, 0.3)',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                background: 'rgba(255, 87, 34, 0.08)'
+              }}
+            >
+              <ShieldAlert size={18} style={{ marginRight: '4px' }} /> Admin Panel
+            </Link>
+          )}
         </div>
         <div className="navbar-profile">
           <Link to="/profile" className="profile-btn" title={`Profile: ${displayName}`}>

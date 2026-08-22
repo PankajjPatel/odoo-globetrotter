@@ -49,18 +49,23 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signup = async (name, email, password, confirmPassword) => {
-    const res = await fetch('/api/auth/signup/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-        confirm_password: confirmPassword,
-      }),
-    });
-
-    const data = await res.json();
+    let res;
+    let data;
+    try {
+      res = await fetch('/api/auth/signup/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          confirm_password: confirmPassword,
+        }),
+      });
+      data = await res.json().catch(() => ({}));
+    } catch {
+      throw new Error('Unable to connect to the backend server. Please make sure Django server is running.');
+    }
 
     if (!res.ok) {
       let errorMessage = data.message || 'Signup failed';
@@ -85,13 +90,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-    const res = await fetch('/api/auth/login/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await res.json();
+    let res;
+    let data;
+    try {
+      res = await fetch('/api/auth/login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      data = await res.json().catch(() => ({}));
+    } catch {
+      throw new Error('Unable to connect to the backend server. Please make sure Django server is running.');
+    }
 
     if (!res.ok) {
       let errorMessage = data.message || 'Invalid email or password';
@@ -116,17 +126,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   const forgotPassword = async (email, newPassword, confirmPassword) => {
-    const res = await fetch('/api/auth/forgot-password/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        new_password: newPassword,
-        confirm_password: confirmPassword,
-      }),
-    });
-
-    const data = await res.json();
+    let res;
+    let data;
+    try {
+      res = await fetch('/api/auth/forgot-password/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          new_password: newPassword,
+          confirm_password: confirmPassword,
+        }),
+      });
+      data = await res.json().catch(() => ({}));
+    } catch {
+      throw new Error('Unable to connect to the backend server. Please make sure Django server is running.');
+    }
 
     if (!res.ok) {
       let errorMessage = data.message || 'Password reset failed';
