@@ -30,7 +30,7 @@ CITIES_DATA = [
         'name': 'Delhi',
         'country': 'India',
         'region': 'North India',
-        'cost_index': '$$',
+        'cost_index': '₹₹',
         'popularity': 'Very High',
         'description': 'The historic capital city of India blending rich heritage with modern sprawl.',
         'image': 'bg-delhi',
@@ -46,7 +46,7 @@ CITIES_DATA = [
             {
                 'name': 'Red Fort',
                 'type': 'History',
-                'cost': 50.00,
+                'cost': 500.00,
                 'duration': '2.5 hours',
                 'description': 'Historic fort in Old Delhi that served as the main residence of Mughal Emperors.',
                 'image': 'bg-red-fort'
@@ -54,7 +54,7 @@ CITIES_DATA = [
             {
                 'name': 'Qutub Minar',
                 'type': 'History',
-                'cost': 40.00,
+                'cost': 350.00,
                 'duration': '2 hours',
                 'description': 'UNESCO World Heritage Site featuring a 73-metre tall minaret built in 1193.',
                 'image': 'bg-qutub-minar'
@@ -62,10 +62,10 @@ CITIES_DATA = [
             {
                 'name': 'National Museum',
                 'type': 'Culture',
-                'cost': 20.00,
+                'cost': 200.00,
                 'duration': '3 hours',
-                'description': 'One of the largest museums in India showcasing historic artifacts and masterpieces.',
-                'image': 'bg-national-museum'
+                'description': 'One of the largest museums in India with over 200,000 works of art.',
+                'image': 'bg-delhi-museum'
             }
         ]
     },
@@ -73,41 +73,41 @@ CITIES_DATA = [
         'name': 'Jaipur',
         'country': 'India',
         'region': 'North India',
-        'cost_index': '$$',
-        'popularity': 'High',
-        'description': 'The Pink City of Rajasthan famous for royal palaces, forts, and vibrant bazaars.',
+        'cost_index': '₹₹',
+        'popularity': 'Very High',
+        'description': 'The famed Pink City known for royal palaces, vibrant bazaars, and grand forts.',
         'image': 'bg-jaipur',
         'activities': [
             {
                 'name': 'Amber Fort',
                 'type': 'History',
-                'cost': 100.00,
-                'duration': '3 hours',
-                'description': 'Majestic hilltop fort with Hindu-style architecture and sweeping views of Maota Lake.',
+                'cost': 500.00,
+                'duration': '3.5 hours',
+                'description': 'Majestic hilltop fort known for artistic Hindu style elements and elephant rides.',
                 'image': 'bg-amber-fort'
             },
             {
                 'name': 'City Palace',
-                'type': 'Sightseeing',
-                'cost': 200.00,
-                'duration': '2 hours',
-                'description': 'Royal palace complex in Jaipur including Chandra Mahal and Mubarak Mahal.',
+                'type': 'Culture',
+                'cost': 700.00,
+                'duration': '2.5 hours',
+                'description': 'Royal residence displaying a stunning fusion of Rajasthani and Mughal architecture.',
                 'image': 'bg-city-palace'
             },
             {
                 'name': 'Hawa Mahal',
-                'type': 'History',
-                'cost': 50.00,
+                'type': 'Sightseeing',
+                'cost': 200.00,
                 'duration': '1 hour',
-                'description': 'Palace of Winds constructed of red and pink sandstone with ornate honeycombed windows.',
+                'description': 'Palace of Winds with 953 intricately designed jharokhas (casements).',
                 'image': 'bg-hawa-mahal'
             },
             {
                 'name': 'Jaipur Food Tour',
-                'type': 'Food & Drink',
-                'cost': 500.00,
+                'type': 'Food',
+                'cost': 1200.00,
                 'duration': '3 hours',
-                'description': 'Guided culinary walking tour trying traditional Rajasthani street foods and kachori.',
+                'description': 'Culinary walking tour exploring traditional Rajasthani sweets and street snacks.',
                 'image': 'bg-jaipur-food'
             }
         ]
@@ -115,35 +115,35 @@ CITIES_DATA = [
     {
         'name': 'Udaipur',
         'country': 'India',
-        'region': 'North India',
-        'cost_index': '$$$',
+        'region': 'West India',
+        'cost_index': '₹₹₹',
         'popularity': 'High',
-        'description': 'The City of Lakes known for its romantic settings, marble palaces, and scenic waters.',
+        'description': 'The romantic City of Lakes surrounded by the Aravali Hills.',
         'image': 'bg-udaipur',
         'activities': [
             {
                 'name': 'Lake Pichola Boat Cruise',
                 'type': 'Sightseeing',
-                'cost': 300.00,
-                'duration': '2 hours',
-                'description': 'Picturesque artificial freshwater lake with boat cruises past Jag Mandir and Lake Palace.',
+                'cost': 850.00,
+                'duration': '1.5 hours',
+                'description': 'Scenic boat tour across Lake Pichola offering sunset views of palaces.',
                 'image': 'bg-lake-pichola'
             },
             {
                 'name': 'City Palace Udaipur',
                 'type': 'History',
-                'cost': 250.00,
+                'cost': 450.00,
                 'duration': '3 hours',
-                'description': 'Grand palace complex built over 400 years overlooking Lake Pichola.',
+                'description': 'Palace complex overlooking Lake Pichola with opulent balconies and courtyards.',
                 'image': 'bg-udaipur-palace'
             },
             {
                 'name': 'Sajjangarh Monsoon Palace',
                 'type': 'Sightseeing',
-                'cost': 90.00,
+                'cost': 300.00,
                 'duration': '2 hours',
-                'description': 'Monsoon Palace hilltop residence offering panoramic sunset views of the lakes.',
-                'image': 'bg-sajjangarh'
+                'description': 'Hilltop palace offering panoramic sunset views over the lakes of Udaipur.',
+                'image': 'bg-monsoon-palace'
             }
         ]
     },
@@ -151,42 +151,42 @@ CITIES_DATA = [
         'name': 'Goa',
         'country': 'India',
         'region': 'West India',
-        'cost_index': '$$$',
+        'cost_index': '₹₹₹',
         'popularity': 'Very High',
-        'description': 'Tropical coastal state known for golden beaches, Portuguese heritage, and vibrant nightlife.',
+        'description': 'Tropical coastal haven famous for golden sandy beaches, lively shacks, and Portuguese history.',
         'image': 'bg-goa',
         'activities': [
             {
                 'name': 'Baga Beach',
-                'type': 'Adventure',
+                'type': 'Relaxation',
                 'cost': 0.00,
                 'duration': '4 hours',
-                'description': 'Popular beach known for lively shacks, water sports, and beachside leisure.',
+                'description': 'Popular beach famous for water sports, beach shacks, and vibrant nightlife.',
                 'image': 'bg-baga-beach'
             },
             {
                 'name': 'Fort Aguada',
                 'type': 'History',
-                'cost': 25.00,
+                'cost': 250.00,
                 'duration': '2 hours',
-                'description': '17th-century Portuguese fort and lighthouse overlooking the Arabian Sea.',
+                'description': 'Seventeenth-century Portuguese fort and lighthouse overlooking Sinquerim Beach.',
                 'image': 'bg-fort-aguada'
             },
             {
                 'name': 'Water Sports Adventure',
                 'type': 'Adventure',
-                'cost': 1200.00,
-                'duration': '2.5 hours',
-                'description': 'Exciting jet skiing, parasailing, and banana boat rides on Calangute Beach.',
-                'image': 'bg-water-sports'
+                'cost': 2500.00,
+                'duration': '3 hours',
+                'description': 'Exciting jet ski, parasailing, and banana boat rides on the Arabian Sea.',
+                'image': 'bg-goa-watersports'
             },
             {
                 'name': 'Scuba Diving Experience',
                 'type': 'Adventure',
-                'cost': 2500.00,
+                'cost': 3500.00,
                 'duration': '4 hours',
-                'description': 'Guided underwater scuba diving experience near Grande Island with marine life.',
-                'image': 'bg-scuba-diving'
+                'description': 'Guided scuba dive off Grande Island with coral reefs and marine life.',
+                'image': 'bg-goa-scuba'
             }
         ]
     },

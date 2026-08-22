@@ -101,10 +101,10 @@ export const CitySearchScreen = () => {
           value={selectedCost}
           onChange={(e) => setSelectedCost(e.target.value)}
         >
-          <option value="Any Cost">Any Budget</option>
-          <option value="$">Budget (₹ &lt; 10,000)</option>
-          <option value="$$">Moderate (₹₹ 10k - 25k)</option>
-          <option value="$$$">Luxury (₹₹₹ 25k+)</option>
+          <option value="Any Cost">Any Cost</option>
+          <option value="₹">Budget (₹)</option>
+          <option value="₹₹">Moderate (₹₹)</option>
+          <option value="₹₹₹">Luxury (₹₹₹)</option>
         </select>
       </div>
 
@@ -117,18 +117,6 @@ export const CitySearchScreen = () => {
         ) : cities.length > 0 ? (
           cities.map(city => {
             const cityImg = DEFAULT_CITY_IMAGES[city.name] || city.image_url || 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=600&q=80';
-            
-            // Format cost to Indian Rupees
-            let costLabel = '₹12,000 - ₹25,000 / trip';
-            let costIconStr = '₹₹';
-            if (city.cost_index === '$' || city.cost_index === '₹') {
-              costLabel = '₹5,000 - ₹12,000 / trip';
-              costIconStr = '₹';
-            } else if (city.cost_index === '$$$' || city.cost_index === '$$$$' || city.cost_index === '₹₹₹') {
-              costLabel = '₹25,000 - ₹50,000 / trip';
-              costIconStr = '₹₹₹';
-            }
-
             return (
               <Card key={city.id} className="city-card hoverable">
                 <div className="city-image-container">
@@ -140,7 +128,7 @@ export const CitySearchScreen = () => {
                   </div>
                   <div className="city-meta-tags">
                     <span className="meta-tag"><TrendingUp size={14}/> {city.popularity || 'Popular'}</span>
-                    <span className="meta-tag fw-600 text-success">Est. {costLabel}</span>
+                    <span className="meta-tag">₹ Cost: {city.cost_index || '₹₹'}</span>
                   </div>
                   <Button 
                     variant="primary" 

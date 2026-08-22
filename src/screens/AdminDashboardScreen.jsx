@@ -59,13 +59,13 @@ const DEFAULT_INITIAL_STATS = {
 };
 
 const DEFAULT_POPULAR_CITIES = [
-  { name: 'Goa', country: 'India', cost_index: '$$$', popularity: 'Very High' },
-  { name: 'Jaipur', country: 'India', cost_index: '$$', popularity: 'Very High' },
-  { name: 'Udaipur', country: 'India', cost_index: '$$$', popularity: 'High' },
-  { name: 'Agra', country: 'India', cost_index: '$$', popularity: 'Very High' },
-  { name: 'Delhi', country: 'India', cost_index: '$$', popularity: 'Very High' },
-  { name: 'Manali', country: 'India', cost_index: '$$', popularity: 'High' },
-  { name: 'Varanasi', country: 'India', cost_index: '$', popularity: 'High' },
+  { name: 'Goa', country: 'India', cost_index: '₹₹₹', popularity: 'Very High' },
+  { name: 'Jaipur', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
+  { name: 'Udaipur', country: 'India', cost_index: '₹₹₹', popularity: 'High' },
+  { name: 'Agra', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
+  { name: 'Delhi', country: 'India', cost_index: '₹₹', popularity: 'Very High' },
+  { name: 'Manali', country: 'India', cost_index: '₹₹', popularity: 'High' },
+  { name: 'Varanasi', country: 'India', cost_index: '₹', popularity: 'High' },
 ];
 
 const DEFAULT_GROWTH = [
@@ -89,14 +89,14 @@ const DEFAULT_INITIAL_TRIPS = [
 ];
 
 const DEFAULT_INITIAL_ACTIVITIES = [
-  { id: 1, name: 'Taj Mahal Sunrise Tour', type: 'Sightseeing', cost: '50.00', duration_hours: 3 },
-  { id: 2, name: 'Amber Fort Elephant & Jeep Ride', type: 'History', cost: '35.00', duration_hours: 3 },
-  { id: 3, name: 'Baga Beach Watersports Combo', type: 'Adventure', cost: '40.00', duration_hours: 4 },
-  { id: 4, name: 'Lake Pichola Sunset Boat Cruise', type: 'Sightseeing', cost: '25.00', duration_hours: 2 },
-  { id: 5, name: 'Solang Valley Paragliding Experience', type: 'Adventure', cost: '45.00', duration_hours: 3 },
-  { id: 6, name: 'Dashashwamedh Ghat Ganga Aarti', type: 'Culture', cost: '0.00', duration_hours: 2 },
-  { id: 7, name: 'Qutub Minar Architectural Walk', type: 'History', cost: '15.00', duration_hours: 2 },
-  { id: 8, name: 'Gateway of India & Elephanta Caves', type: 'Sightseeing', cost: '30.00', duration_hours: 4 },
+  { id: 1, name: 'Taj Mahal Sunrise Tour', type: 'Sightseeing', cost: '1,100', duration_hours: 3 },
+  { id: 2, name: 'Amber Fort Elephant & Jeep Ride', type: 'History', cost: '500', duration_hours: 3 },
+  { id: 3, name: 'Baga Beach Watersports Combo', type: 'Adventure', cost: '2,500', duration_hours: 4 },
+  { id: 4, name: 'Lake Pichola Sunset Boat Cruise', type: 'Sightseeing', cost: '850', duration_hours: 2 },
+  { id: 5, name: 'Solang Valley Paragliding Experience', type: 'Adventure', cost: '3,200', duration_hours: 3 },
+  { id: 6, name: 'Dashashwamedh Ghat Ganga Aarti', type: 'Culture', cost: 'Free', duration_hours: 2 },
+  { id: 7, name: 'Qutub Minar Architectural Walk', type: 'History', cost: '350', duration_hours: 2 },
+  { id: 8, name: 'Gateway of India & Elephanta Caves', type: 'Sightseeing', cost: '750', duration_hours: 4 },
 ];
 
 export const AdminDashboardScreen = () => {
@@ -303,12 +303,22 @@ export const AdminDashboardScreen = () => {
       {/* KPI Stats Grid - All Clickable */}
       <div className="admin-kpi-grid">
         {statCards.map((item, idx) => (
-          <Card 
+          <div 
             key={idx} 
+            role="button"
+            tabIndex={0}
             className="kpi-card kpi-card-clickable glass"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setKpiModalSearch('');
               setActiveKpiModal(item.type);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                setKpiModalSearch('');
+                setActiveKpiModal(item.type);
+              }
             }}
             title={`${item.title} — ${item.subtext}`}
           >
@@ -326,7 +336,7 @@ export const AdminDashboardScreen = () => {
               <span>{item.subtext}</span>
               <span className="kpi-arrow-icon">→</span>
             </div>
-          </Card>
+          </div>
         ))}
       </div>
 
