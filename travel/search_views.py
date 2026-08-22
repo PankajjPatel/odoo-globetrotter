@@ -8,7 +8,7 @@ from .serializers import CitySerializer, ActivitySerializer
 
 
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10
+    page_size = 20
     page_size_query_param = 'page_size'
     max_page_size = 100
 
@@ -68,12 +68,13 @@ class CitySearchView(APIView):
 
             elif sort_by in ('cost_index', '-cost_index', 'cost', '-cost'):
                 cost_order = Case(
+                    When(cost_index='₹', then=Value(1)),
+                    When(cost_index='₹₹', then=Value(2)),
+                    When(cost_index='₹₹₹', then=Value(3)),
                     When(cost_index='$', then=Value(1)),
                     When(cost_index='$$', then=Value(2)),
                     When(cost_index='$$$', then=Value(3)),
-                    When(cost_index='$$$$', then=Value(4)),
-                    When(cost_index='$$$$$', then=Value(5)),
-                    default=Value(3),
+                    default=Value(2),
                     output_field=IntegerField()
                 )
                 if sort_by in ('-cost_index', '-cost'):
@@ -86,23 +87,21 @@ class CitySearchView(APIView):
             elif sort_by == 'name':
                 queryset = queryset.order_by('name')
 
-            # Check if pagination is explicitly turned off
-            paginate_param = request.query_params.get('paginate', 'true').strip().lower()
-            if paginate_param == 'false':
-                serializer = CitySerializer(queryset, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-
-            paginator = StandardResultsSetPagination()
-            page_obj = paginator.paginate_queryset(queryset, request, view=self)
-            if page_obj is not None:
-                serializer = CitySerializer(page_obj, many=True)
-                return paginator.get_paginated_response(serializer.data)
+            # Check if pagination is explicitly requested
+            page_param = request.query_params.get('page')
+            paginate_param = request.query_params.get('paginate', 'false').strip().lower()
+            if paginate_param == 'true' or page_param:
+                paginator = StandardResultsSetPagination()
+                page_obj = paginator.paginate_queryset(queryset, request, view=self)
+                if page_obj is not None:
+                    serializer = CitySerializer(page_obj, many=True)
+                    return paginator.get_paginated_response(serializer.data)
 
             serializer = CitySerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response([], status=status.HTTP_200_OK)
 
 
 class ActivitySearchView(APIView):
@@ -112,19 +111,16 @@ class ActivitySearchView(APIView):
     
     Query Parameters:
       - city: filter by city ID or city name
-      - type / category: filter by type (e.g. Sightseeing, Food, Adventure, History, Culture)
+      - type / category: filter by type (Sightseeing, Food, Adventure, History, Culture)
       - min_cost: minimum cost filter
       - max_cost: maximum cost filter
       - duration: filter by duration substring
       - search / q: general text search on name or description
       - sort_by / ordering: 'cost', '-cost', 'name', '-name'
-      - page, page_size: pagination controls
-      - paginate: set to 'false' to disable pagination
     """
 
     def get(self, request, *args, **kwargs):
         try:
-            # Query optimization: select_related('city')
             queryset = Activity.objects.select_related('city').all()
 
             # City filter (ID or Name)
@@ -137,7 +133,7 @@ class ActivitySearchView(APIView):
 
             # Type / Category filter
             type_param = (request.query_params.get('type') or request.query_params.get('category') or '').strip()
-            if type_param:
+            if type_param and type_param != 'Any Type':
                 queryset = queryset.filter(type__icontains=type_param)
 
             # Min & Max cost filters
@@ -157,14 +153,15 @@ class ActivitySearchView(APIView):
 
             # Duration filter
             duration_param = request.query_params.get('duration', '').strip()
-            if duration_param:
+            if duration_param and duration_param != 'Any Duration':
                 queryset = queryset.filter(duration__icontains=duration_param)
 
-            # Search query (name or description)
+            # Search query (name, description, city)
             search_query = (request.query_params.get('search') or request.query_params.get('q') or '').strip()
             if search_query:
                 queryset = queryset.filter(
                     Q(name__icontains=search_query) |
+                    Q(city__name__icontains=search_query) |
                     Q(description__icontains=search_query) |
                     Q(type__icontains=search_query)
                 )
@@ -180,20 +177,17 @@ class ActivitySearchView(APIView):
             elif sort_by == 'name':
                 queryset = queryset.order_by('name')
 
-            # Pagination
-            paginate_param = request.query_params.get('paginate', 'true').strip().lower()
-            if paginate_param == 'false':
-                serializer = ActivitySerializer(queryset, many=True)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-
-            paginator = StandardResultsSetPagination()
-            page_obj = paginator.paginate_queryset(queryset, request, view=self)
-            if page_obj is not None:
-                serializer = ActivitySerializer(page_obj, many=True)
-                return paginator.get_paginated_response(serializer.data)
+            page_param = request.query_params.get('page')
+            paginate_param = request.query_params.get('paginate', 'false').strip().lower()
+            if paginate_param == 'true' or page_param:
+                paginator = StandardResultsSetPagination()
+                page_obj = paginator.paginate_queryset(queryset, request, view=self)
+                if page_obj is not None:
+                    serializer = ActivitySerializer(page_obj, many=True)
+                    return paginator.get_paginated_response(serializer.data)
 
             serializer = ActivitySerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response([], status=status.HTTP_200_OK)

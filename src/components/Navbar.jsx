@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { MapPin, LayoutDashboard, PlusCircle, Compass, User, LogOut, ShieldAlert } from 'lucide-react';
+import { MapPin, LayoutDashboard, PlusCircle, Compass, User, LogOut, ShieldAlert, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
@@ -32,13 +32,19 @@ export const Navbar = () => {
 
         <div className="navbar-links">
           <Link to="/dashboard" className={`nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}>
-            <LayoutDashboard size={18} /> <span>Dashboard</span>
+            <LayoutDashboard size={17} /> <span>Dashboard</span>
           </Link>
           <Link to="/my-trips" className={`nav-link ${location.pathname === '/my-trips' ? 'active' : ''}`}>
-            <MapPin size={18} /> <span>My Trips</span>
+            <MapPin size={17} /> <span>My Trips</span>
+          </Link>
+          <Link to="/search/city" className={`nav-link ${location.pathname === '/search/city' ? 'active' : ''}`}>
+            <Compass size={17} /> <span>Destinations</span>
+          </Link>
+          <Link to="/search/activity" className={`nav-link ${location.pathname === '/search/activity' ? 'active' : ''}`}>
+            <Sparkles size={17} /> <span>Activities</span>
           </Link>
           <Link to="/create-trip" className="nav-link-cta">
-            <PlusCircle size={18} /> <span>Plan Trip</span>
+            <PlusCircle size={17} /> <span>Plan Trip</span>
           </Link>
         </div>
 
