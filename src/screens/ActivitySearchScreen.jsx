@@ -7,11 +7,11 @@ import './ActivitySearchScreen.css';
 export const ActivitySearchScreen = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Dummy Data
+  // Real Image Data
   const activities = [
-    { id: 1, name: 'Eiffel Tower Tour', city: 'Paris', type: 'Sightseeing', cost: '$30', duration: '2 hours', image: 'bg-paris' },
-    { id: 2, name: 'Sushi Making Class', city: 'Tokyo', type: 'Food', cost: '$80', duration: '3 hours', image: 'bg-tokyo' },
-    { id: 3, name: 'Colosseum Underground', city: 'Rome', type: 'History', cost: '$45', duration: '2.5 hours', image: 'bg-rome' },
+    { id: 1, name: 'Taj Mahal Sunrise Tour', city: 'Agra', type: 'Sightseeing', cost: '₹2,500', duration: '3 hours', image: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80' },
+    { id: 2, name: 'Backwaters Houseboat', city: 'Kerala', type: 'Relaxation', cost: '₹8,000', duration: '6 hours', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=600&q=80' },
+    { id: 3, name: 'Street Food Walk', city: 'Old Delhi', type: 'Food', cost: '₹1,200', duration: '2.5 hours', image: 'https://images.unsplash.com/photo-1589301773820-2c7c5edc15eb?w=600&q=80' },
   ];
 
   return (
@@ -42,10 +42,10 @@ export const ActivitySearchScreen = () => {
         </select>
         <select className="filter-select">
           <option>Any Cost</option>
-          <option>Free</option>
-          <option>Under $50</option>
-          <option>$50 - $100</option>
-          <option>Over $100</option>
+          <option>Cost</option>
+          <option>Under ₹2,000</option>
+          <option>₹2,000 - ₹5,000</option>
+          <option>Over ₹5,000</option>
         </select>
         <select className="filter-select">
           <option>Any Duration</option>
@@ -58,7 +58,8 @@ export const ActivitySearchScreen = () => {
       <div className="activities-grid">
         {activities.map(act => (
           <Card key={act.id} className="activity-card hoverable">
-            <div className={`activity-image ${act.image}`}>
+            <div className="activity-image-container">
+              <img src={act.image} alt={act.name} className="activity-image-real" />
               <span className="activity-type-badge">{act.type}</span>
             </div>
             <div className="activity-info">

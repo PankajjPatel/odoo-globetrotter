@@ -443,6 +443,21 @@ def seed_database():
                 activity.save()
                 print(f"      [~] Existing Activity updated: {activity.name}")
 
+    # Also seed api.models.City if api app is present
+    try:
+        from api.models import City as ApiCity
+        for item in CITIES_DATA:
+            ApiCity.objects.get_or_create(
+                name=item['name'],
+                defaults={
+                    'country': item['country'],
+                    'description': item['description'],
+                    'image_url': item['image']
+                }
+            )
+    except Exception:
+        pass
+
     total_cities = City.objects.count()
     total_activities = Activity.objects.count()
 

@@ -52,14 +52,14 @@ export const BudgetScreen = () => {
           <div className="summary-icon bg-blue-light text-blue"><DollarSign size={24} /></div>
           <div className="summary-info">
             <span className="summary-label">Total Budget</span>
-            <span className="summary-value">${budgetSummary.totalBudget}</span>
+            <span className="summary-value">₹{budgetSummary.totalBudget}</span>
           </div>
         </Card>
         <Card className="summary-card glass">
           <div className="summary-icon bg-orange-light text-orange"><TrendingUp size={24} /></div>
           <div className="summary-info">
             <span className="summary-label">Total Estimated Cost</span>
-            <span className="summary-value">${budgetSummary.totalSpent}</span>
+            <span className="summary-value">₹{budgetSummary.totalSpent}</span>
           </div>
         </Card>
         <Card className={`summary-card glass ${budgetSummary.remaining < 0 ? 'border-danger' : 'border-success'}`}>
@@ -69,7 +69,7 @@ export const BudgetScreen = () => {
           <div className="summary-info">
             <span className="summary-label">Remaining Budget</span>
             <span className={`summary-value ${budgetSummary.remaining < 0 ? 'text-danger' : 'text-success'}`}>
-              ${budgetSummary.remaining}
+              ₹{budgetSummary.remaining}
             </span>
           </div>
         </Card>
@@ -94,7 +94,7 @@ export const BudgetScreen = () => {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => `$${value}`} />
+                <Tooltip formatter={(value) => `₹${value}`} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -108,8 +108,8 @@ export const BudgetScreen = () => {
               <BarChart data={expensesByDay} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="day" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `$${value}`} />
-                <Tooltip formatter={(value) => `$${value}`} cursor={{fill: 'rgba(0,0,0,0.05)'}} />
+                <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `₹${value}`} />
+                <Tooltip formatter={(value) => `₹${value}`} cursor={{fill: 'rgba(0,0,0,0.05)'}} />
                 <Legend />
                 <Bar dataKey="spent" name="Estimated Cost" fill="var(--primary-color)" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="budget" name="Daily Budget" fill="var(--border-color)" radius={[4, 4, 0, 0]} />

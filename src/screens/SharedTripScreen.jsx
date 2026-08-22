@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
-import { MapPin, Calendar as CalendarIcon, Clock, Share2, Copy, Instagram, Linkedin } from 'lucide-react';
+import { MapPin, Calendar as CalendarIcon, Clock, Share2, Copy } from 'lucide-react';
 import './SharedTripScreen.css';
 
 export const SharedTripScreen = () => {
@@ -12,7 +12,7 @@ export const SharedTripScreen = () => {
   const trip = {
     name: 'Summer in Europe',
     dates: 'Jun 15 - Jun 30, 2026',
-    cover: 'bg-europe',
+    cover: 'https://images.unsplash.com/photo-1491557345352-5929e343eb89?w=1600&q=80',
     creator: 'Explorer Doe',
   };
 
@@ -36,7 +36,7 @@ export const SharedTripScreen = () => {
 
   return (
     <div className="shared-trip-container animate-fade-in">
-      <div className={`shared-banner ${trip.cover}`}>
+      <div className="shared-banner" style={{backgroundImage: `url('${trip.cover}')`}}>
         <div className="shared-banner-overlay">
           <div className="container">
             <span className="shared-badge">Public Itinerary</span>
@@ -94,9 +94,7 @@ export const SharedTripScreen = () => {
             
             <h4 className="mt-4 mb-2">Share this itinerary</h4>
             <div className="social-buttons">
-              <Button variant="outline" className="flex-1"><Instagram size={18} /></Button>
-              <Button variant="outline" className="flex-1"><Linkedin size={18} /></Button>
-              <Button variant="outline" className="flex-1"><Share2 size={18} /></Button>
+              <Button variant="outline" className="flex-1"><Share2 size={18} /> Share Itinerary</Button>
             </div>
             
             <div className="public-url-box mt-4">
