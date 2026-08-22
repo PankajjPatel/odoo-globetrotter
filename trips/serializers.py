@@ -45,3 +45,19 @@ class TripCreateUpdateSerializer(serializers.ModelSerializer):
             )
 
         return attrs
+
+
+class TripDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trip
+        fields = [
+            'id',
+            'name',
+            'description',
+            'start_date',
+            'end_date',
+            'cover_photo',
+            'is_public',
+            'share_uuid',
+        ]
+
