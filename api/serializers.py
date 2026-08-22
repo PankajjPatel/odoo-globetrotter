@@ -1,19 +1,45 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from travel.models import UserProfile, SavedDestination, City
 import re
 
 class UserSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
+    profile_photo = serializers.SerializerMethodField()
+    language_preference = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'full_name', 'is_staff', 'is_superuser', 'date_joined']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'full_name', 'profile_photo', 'language_preference', 'is_staff', 'is_superuser', 'date_joined']
         read_only_fields = ['id', 'username', 'date_joined', 'full_name', 'is_staff', 'is_superuser']
 
     def get_full_name(self, obj):
         name = f"{obj.first_name} {obj.last_name}".strip()
         return name if name else obj.username
+
+    def get_profile_photo(self, obj):
+        if hasattr(obj, 'profile'):
+            return obj.profile.profile_photo or ''
+        return ''
+
+    def get_language_preference(self, obj):
+        if hasattr(obj, 'profile'):
+            return obj.profile.language_preference or 'en'
+        return 'en'
+
+
+class SavedDestinationSerializer(serializers.ModelSerializer):
+    city_name = serializers.CharField(source='city.name', read_only=True)
+    country = serializers.CharField(source='city.country', read_only=True)
+    cost_index = serializers.CharField(source='city.cost_index', read_only=True)
+    popularity = serializers.CharField(source='city.popularity', read_only=True)
+    image = serializers.CharField(source='city.image', read_only=True)
+
+    class Meta:
+        model = SavedDestination
+        fields = ['id', 'city', 'city_name', 'country', 'cost_index', 'popularity', 'image', 'saved_at']
+
 
 
 class SignupSerializer(serializers.Serializer):

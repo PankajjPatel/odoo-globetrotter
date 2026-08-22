@@ -122,10 +122,25 @@ class CurrentUserView(APIView):
 class ProfileUpdateView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def patch(self, request):
+    def get(self, request):
         user = request.user
-        full_name = request.data.get('full_name', '').strip()
-        email = request.data.get('email', '').strip()
+        return Response({
+            "user": UserSerializer(user).data
+        }, status=status.HTTP_200_OK)
+
+    def put(self, request):
+        return self._update_profile(request)
+
+    def patch(self, request):
+        return self._update_profile(request)
+
+    def _update_profile(self, request):
+        user = request.user
+        data = request.data
+        full_name = data.get('name', data.get('full_name', '')).strip()
+        email = data.get('email', '').strip()
+        profile_photo = data.get('profile_photo', data.get('photo', '')).strip()
+        language_preference = data.get('language_preference', data.get('language', '')).strip()
 
         if full_name:
             parts = full_name.split(' ', 1)
@@ -139,9 +154,67 @@ class ProfileUpdateView(APIView):
             user.email = email.lower()
 
         user.save()
+
+        # Update UserProfile attributes
+        from travel.models import UserProfile
+        profile, _ = UserProfile.objects.get_or_create(user=user)
+        if profile_photo is not None:
+            profile.profile_photo = profile_photo
+        if language_preference:
+            profile.language_preference = language_preference
+        profile.save()
+
         return Response({
             "message": "Profile updated successfully!",
             "user": UserSerializer(user).data
+        }, status=status.HTTP_200_OK)
+
+
+class SavedDestinationsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from travel.models import SavedDestination
+        from .serializers import SavedDestinationSerializer
+        saved = SavedDestination.objects.filter(user=request.user).select_related('city')
+        return Response({
+            "saved_destinations": SavedDestinationSerializer(saved, many=True).data
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        from travel.models import City, SavedDestination
+        from .serializers import SavedDestinationSerializer
+        city_id = request.data.get('city_id')
+        city_name = request.data.get('city_name', '').strip()
+
+        city = None
+        if city_id:
+            city = City.objects.filter(id=city_id).first()
+        elif city_name:
+            city = City.objects.filter(name__iexact=city_name).first()
+
+        if not city:
+            return Response({"message": "City not found in catalog."}, status=status.HTTP_404_NOT_FOUND)
+
+        saved_item, created = SavedDestination.objects.get_or_create(user=request.user, city=city)
+        return Response({
+            "message": "Destination saved successfully!" if created else "Destination already saved.",
+            "saved_destination": SavedDestinationSerializer(saved_item).data
+        }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+
+class SavedDestinationDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, city_id):
+        from travel.models import SavedDestination
+        deleted_count, _ = SavedDestination.objects.filter(user=request.user, city_id=city_id).delete()
+        if deleted_count == 0:
+            # Also try matching by saved_destination.id directly
+            deleted_count, _ = SavedDestination.objects.filter(user=request.user, id=city_id).delete()
+
+        return Response({
+            "message": "Destination removed from saved list."
         }, status=status.HTTP_200_OK)
 
 

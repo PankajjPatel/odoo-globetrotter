@@ -6,6 +6,8 @@ from .views import (
     ForgotPasswordView,
     CurrentUserView,
     ProfileUpdateView,
+    SavedDestinationsView,
+    SavedDestinationDetailView,
     DeleteAccountView,
     AdminStatsView,
     AdminUserListView,
@@ -24,6 +26,10 @@ urlpatterns = [
     path('auth/profile/', ProfileUpdateView.as_view(), name='api-profile-update'),
     path('auth/delete-account/', DeleteAccountView.as_view(), name='api-delete-account'),
 
+    # Saved Destinations
+    path('saved-destinations/', SavedDestinationsView.as_view(), name='api-saved-destinations'),
+    path('saved-destinations/<int:city_id>/', SavedDestinationDetailView.as_view(), name='api-saved-destination-detail'),
+
     # Admin Management
     path('admin/stats/', AdminStatsView.as_view(), name='api-admin-stats'),
     path('admin/users/', AdminUserListView.as_view(), name='api-admin-users'),
@@ -31,3 +37,4 @@ urlpatterns = [
     path('admin/users/<int:user_id>/toggle-role/', AdminUserToggleRoleView.as_view(), name='api-admin-toggle-role'),
     path('admin/users/<int:user_id>/', AdminUserDeleteView.as_view(), name='api-admin-delete-user'),
 ]
+
