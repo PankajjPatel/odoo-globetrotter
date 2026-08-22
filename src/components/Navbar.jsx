@@ -40,14 +40,6 @@ export const Navbar = () => {
           <Link to="/create-trip" className="nav-link-cta">
             <PlusCircle size={18} /> <span>Plan Trip</span>
           </Link>
-          {isAdmin && (
-            <Link
-              to="/admin"
-              className={`nav-link admin-nav-badge ${location.pathname === '/admin' ? 'active' : ''}`}
-            >
-              <ShieldAlert size={17} /> <span>Admin Panel</span>
-            </Link>
-          )}
         </div>
 
         <div className="navbar-profile">

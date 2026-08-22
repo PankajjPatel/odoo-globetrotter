@@ -14,22 +14,29 @@ import {
   Compass, 
   Plus, 
   X,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck,
+  Users,
+  Activity,
+  MapPin,
+  ArrowRight,
+  Database
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './ProfileScreen.css';
 
 const AVATAR_COLORS = [
-  { id: 'sunset', bg: 'linear-gradient(135deg, #ff5722 0%, #ff8a65 100%)', label: 'Sunset Orange' },
-  { id: 'ocean', bg: 'linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)', label: 'Ocean Blue' },
-  { id: 'emerald', bg: 'linear-gradient(135deg, #059669 0%, #34d399 100%)', label: 'Emerald' },
-  { id: 'royal', bg: 'linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)', label: 'Royal Purple' },
+  { id: 'sunset', bg: 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)', label: 'Sunset Orange' },
+  { id: 'ocean', bg: 'linear-gradient(135deg, #2563eb 0%, #60a5fa 100%)', label: 'Ocean Blue' },
+  { id: 'emerald', bg: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', label: 'Emerald' },
+  { id: 'royal', bg: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)', label: 'Indigo' },
   { id: 'midnight', bg: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)', label: 'Midnight' },
 ];
 
 export const ProfileScreen = () => {
   const navigate = useNavigate();
-  const { user, updateProfile, deleteAccount } = useAuth();
+  const { user, token, updateProfile, deleteAccount } = useAuth();
+  const isAdmin = user?.is_superuser || user?.is_staff || user?.username === '_Pankaj_03';
 
   const [profile, setProfile] = useState({
     name: user?.full_name || user?.first_name || user?.username || '',
@@ -37,6 +44,7 @@ export const ProfileScreen = () => {
     language: localStorage.getItem('globetrotter_lang') || 'English',
   });
 
+  const [adminStats, setAdminStats] = useState(null);
   const [selectedAvatarColor, setSelectedAvatarColor] = useState(
     localStorage.getItem('globetrotter_avatar_color') || 'sunset'
   );
@@ -66,6 +74,23 @@ export const ProfileScreen = () => {
       }));
     }
   }, [user]);
+
+  // Fetch admin overview if user is admin
+  useEffect(() => {
+    if (isAdmin) {
+      const authToken = token || localStorage.getItem('globetrotter_token');
+      if (authToken) {
+        fetch('/api/admin/stats/', {
+          headers: { 'Authorization': `Token ${authToken}` }
+        })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data && data.stats) setAdminStats(data.stats);
+          })
+          .catch(() => {});
+      }
+    }
+  }, [isAdmin, token]);
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
@@ -221,6 +246,67 @@ export const ProfileScreen = () => {
               </div>
             </form>
           </Card>
+
+          {/* Administrator Management Section (Only for Admins) */}
+          {isAdmin && (
+            <Card className="profile-admin-card glass">
+              <div className="admin-card-header">
+                <div className="flex-align-center gap-2">
+                  <div className="admin-shield-icon">
+                    <ShieldCheck size={22} />
+                  </div>
+                  <div>
+                    <h2>System Administration & Control</h2>
+                    <p className="card-subtext">You have elevated platform permissions and database management rights.</p>
+                  </div>
+                </div>
+                <span className="admin-status-badge">
+                  {user?.is_superuser ? 'Superuser' : 'Staff Admin'}
+                </span>
+              </div>
+
+              <div className="admin-quick-stats-row">
+                <div className="quick-stat-box">
+                  <div className="quick-stat-icon-wrapper blue"><Users size={16} /></div>
+                  <div>
+                    <span className="quick-stat-val">{adminStats ? adminStats.total_users : '...'}</span>
+                    <span className="quick-stat-lbl">Total Users</span>
+                  </div>
+                </div>
+                <div className="quick-stat-box">
+                  <div className="quick-stat-icon-wrapper orange"><Compass size={16} /></div>
+                  <div>
+                    <span className="quick-stat-val">{adminStats ? adminStats.total_trips : '...'}</span>
+                    <span className="quick-stat-lbl">Active Trips</span>
+                  </div>
+                </div>
+                <div className="quick-stat-box">
+                  <div className="quick-stat-icon-wrapper green"><MapPin size={16} /></div>
+                  <div>
+                    <span className="quick-stat-val">{adminStats ? adminStats.total_stops : '...'}</span>
+                    <span className="quick-stat-lbl">Destinations</span>
+                  </div>
+                </div>
+                <div className="quick-stat-box">
+                  <div className="quick-stat-icon-wrapper purple"><Activity size={16} /></div>
+                  <div>
+                    <span className="quick-stat-val">{adminStats ? (adminStats.total_trip_activities || adminStats.total_activities) : '...'}</span>
+                    <span className="quick-stat-lbl">Activities</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="admin-card-actions">
+                <Button 
+                  variant="primary" 
+                  className="btn-open-admin-portal"
+                  onClick={() => navigate('/admin')}
+                >
+                  <Database size={16} className="mr-2" /> Open Full Admin Management Portal <ArrowRight size={16} className="ml-2" />
+                </Button>
+              </div>
+            </Card>
+          )}
 
           {/* Danger Zone */}
           <Card className="danger-zone-card">

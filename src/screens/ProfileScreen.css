@@ -171,6 +171,137 @@
   font-weight: 600;
   padding: 0 1.75rem;
   border-radius: 10px;
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+  transition: all 0.2s ease;
+}
+
+.save-changes-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
+}
+
+/* Administrator Card Inside Profile */
+.profile-admin-card {
+  padding: 1.75rem;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border: 1.5px solid #fed7aa;
+  box-shadow: 0 4px 20px -2px rgba(249, 115, 22, 0.08);
+}
+
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.admin-shield-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #ffedd5;
+  color: #ea580c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-card-header h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.admin-status-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.admin-quick-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .admin-quick-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.quick-stat-box {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.85rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.quick-stat-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-stat-icon-wrapper.blue { background: #eff6ff; color: #2563eb; }
+.quick-stat-icon-wrapper.orange { background: #fff7ed; color: #ea580c; }
+.quick-stat-icon-wrapper.green { background: #ecfdf5; color: #059669; }
+.quick-stat-icon-wrapper.purple { background: #f5f3ff; color: #7c3aed; }
+
+.quick-stat-val {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+.quick-stat-lbl {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.admin-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-open-admin-portal {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  height: 42px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border-radius: 10px;
+}
+
+.btn-open-admin-portal:hover {
+  background: #1e293b !important;
+  transform: translateY(-1px);
 }
 
 .danger-zone-card {

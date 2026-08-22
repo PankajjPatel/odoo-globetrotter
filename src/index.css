@@ -1,28 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Brand Colors */
-  --primary-color: #f77f00; /* Vibrant Orange */
-  --primary-hover: #d66c00;
-  --secondary-color: #003049; /* Deep Ocean Blue */
-  --accent-color: #fcbf49; /* Yellow Accent */
+  /* Premium Brand Colors */
+  --primary-color: #f97316; /* Refined Warm Ember */
+  --primary-hover: #ea580c;
+  --secondary-color: #0f172a; /* Deep Slate Navy */
+  --brand-blue: #2563eb;
+  --brand-indigo: #4f46e5;
+  --accent-color: #f59e0b; /* Amber */
   
-  /* Neutral Colors */
-  --bg-color: #f8f9fa;
+  /* Neutral Colors & Surfaces */
+  --bg-color: #f8fafc; /* Crisp Slate Canvas */
   --bg-surface: #ffffff;
-  --text-primary: #1a1a1a;
-  --text-secondary: #6c757d;
-  --border-color: #e9ecef;
+  --bg-surface-subtle: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --border-subtle: #f1f5f9;
   
-  /* Status Colors */
-  --success: #2a9d8f;
-  --danger: #e63946;
-  --warning: #f4a261;
-  --info: #457b9d;
+  /* Semantic Status Colors */
+  --success: #10b981;
+  --success-bg: #ecfdf5;
+  --danger: #ef4444;
+  --danger-bg: #fef2f2;
+  --warning: #f59e0b;
+  --warning-bg: #fffbeb;
+  --info: #0284c7;
+  --info-bg: #f0f9ff;
 
   /* Typography */
-  --font-heading: 'Outfit', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -30,19 +39,21 @@
   --spacing-md: 1rem;
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
+  --spacing-xxl: 3rem;
   
   /* Border Radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
   --radius-pill: 9999px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  /* Premium Box Shadows */
+  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 4px 0 rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.1), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+  --shadow-xl: 0 20px 40px -6px rgba(15, 23, 42, 0.14);
 }
 
 * {
