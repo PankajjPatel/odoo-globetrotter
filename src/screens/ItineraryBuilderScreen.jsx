@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
-import { MapPin, Plus, GripVertical, Calendar, Clock, DollarSign, ArrowRight } from 'lucide-react';
+import { MapPin, Plus, GripVertical, Calendar, Clock, IndianRupee, ArrowRight } from 'lucide-react';
 import './ItineraryBuilderScreen.css';
 
 export const ItineraryBuilderScreen = () => {
   const { id } = useParams();
-  
+  const location = useLocation();
+  const tripState = location.state || {};
+  const destination = tripState.destination || 'Goa, India';
+  const startDate = tripState.startDate || '2026-06-15';
+
   // Dummy State for the itinerary builder
   const [stops, setStops] = useState([
     {
       id: 'stop-1',
-      city: 'Paris, France',
-      date: '2026-06-15',
+      city: destination,
+      date: startDate,
       activities: [
-        { id: 'act-1', name: 'Visit Eiffel Tower', time: '10:00 AM', cost: 30 },
-        { id: 'act-2', name: 'Lunch at Cafe de Flore', time: '01:00 PM', cost: 45 }
+        { id: 'act-1', name: 'Explore local sights', time: '10:00 AM', cost: 500 },
+        { id: 'act-2', name: 'Lunch at famous restaurant', time: '01:00 PM', cost: 1200 }
       ]
     }
   ]);
@@ -140,7 +144,7 @@ export const ItineraryBuilderScreen = () => {
                         />
                       </div>
                       <div className="input-with-icon flex-1">
-                        <DollarSign size={14} />
+                        <IndianRupee size={14} />
                         <input 
                           type="number" 
                           placeholder="Cost"

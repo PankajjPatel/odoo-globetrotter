@@ -12,6 +12,7 @@ import { ActivitySearchScreen } from './screens/ActivitySearchScreen';
 import { SharedTripScreen } from './screens/SharedTripScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { AdminDashboardScreen } from './screens/AdminDashboardScreen';
+import { LandingScreen } from './screens/LandingScreen';
 
 // We have now implemented all screens!
 
@@ -20,7 +21,7 @@ function App() {
     <Router>
       <div className="app-container">
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<LandingScreen />} />
           <Route path="/login" element={<LoginScreen />} />
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<DashboardScreen />} />

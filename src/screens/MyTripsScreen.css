@@ -20,18 +20,28 @@
   gap: var(--spacing-lg);
 }
 
-.trip-card-large {
+.trip-card {
   padding: 0 !important;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-.trip-cover-large {
-  height: 180px;
-  background-size: cover;
-  background-position: center;
+.trip-cover-container {
+  height: 220px;
   position: relative;
+  overflow: hidden;
+}
+
+.trip-cover-real {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.trip-card:hover .trip-cover-real {
+  transform: scale(1.05);
 }
 
 .bg-ny { background-color: #457b9d; }

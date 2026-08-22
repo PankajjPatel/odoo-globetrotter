@@ -7,12 +7,12 @@ import './CitySearchScreen.css';
 export const CitySearchScreen = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Dummy Data
+  // Real Image Data
   const cities = [
-    { id: 1, name: 'Tokyo', country: 'Japan', costIndex: '$$$', popularity: 'Very High', image: 'bg-tokyo' },
-    { id: 2, name: 'Paris', country: 'France', costIndex: '$$$$', popularity: 'High', image: 'bg-paris' },
-    { id: 3, name: 'Bali', country: 'Indonesia', costIndex: '$', popularity: 'High', image: 'bg-bali' },
-    { id: 4, name: 'Rome', country: 'Italy', costIndex: '$$', popularity: 'High', image: 'bg-rome' },
+    { id: 1, name: 'Jaipur', country: 'India', costIndex: '₹₹', popularity: 'Very High', image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=600&q=80' },
+    { id: 2, name: 'Varanasi', country: 'India', costIndex: '₹', popularity: 'High', image: 'https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=600&q=80' },
+    { id: 3, name: 'Bali', country: 'Indonesia', costIndex: '₹₹', popularity: 'High', image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80' },
+    { id: 4, name: 'Tokyo', country: 'Japan', costIndex: '₹₹₹₹', popularity: 'Very High', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=80' },
   ];
 
   return (
@@ -42,16 +42,18 @@ export const CitySearchScreen = () => {
         </select>
         <select className="filter-select">
           <option>Any Cost</option>
-          <option>Budget ($)</option>
-          <option>Moderate ($$)</option>
-          <option>Luxury ($$$$)</option>
+          <option>Budget (₹)</option>
+          <option>Moderate (₹₹)</option>
+          <option>Luxury (₹₹₹₹)</option>
         </select>
       </div>
 
       <div className="cities-grid">
         {cities.map(city => (
           <Card key={city.id} className="city-card hoverable">
-            <div className={`city-image ${city.image}`}></div>
+            <div className="city-image-container">
+              <img src={city.image} alt={city.name} className="city-image-real" />
+            </div>
             <div className="city-info">
               <div className="city-title-row">
                 <h3>{city.name}, <span className="text-secondary">{city.country}</span></h3>
