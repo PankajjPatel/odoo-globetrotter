@@ -172,3 +172,69 @@ class TripAPIViewSetTestCase(APITestCase):
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_reorder_stops_success(self):
+        self.client.force_authenticate(user=self.user1)
+        stop1 = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        stop2 = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=1
+        )
+        url = reverse('reorder-stops', kwargs={'trip_id': self.trip1.id})
+        data = {
+            'order': [stop2.id, stop1.id]
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        stop1.refresh_from_db()
+        stop2.refresh_from_db()
+        self.assertEqual(stop1.order, 1)
+        self.assertEqual(stop2.order, 0)
+
+    def test_reorder_stops_other_user_trip_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('reorder-stops', kwargs={'trip_id': self.trip2.id})
+        data = {
+            'order': []
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_stop_success(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        url = reverse('delete-stop', kwargs={'stop_id': stop.id})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Stop.objects.filter(id=stop.id).exists())
+
+    def test_delete_stop_other_user_stop_returns_404(self):
+        self.client.force_authenticate(user=self.user1)
+        stop = Stop.objects.create(
+            trip=self.trip2,
+            city=self.city1,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=1),
+            order=0
+        )
+        url = reverse('delete-stop', kwargs={'stop_id': stop.id})
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(Stop.objects.filter(id=stop.id).exists())
+

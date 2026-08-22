@@ -38,3 +38,31 @@ class AddStopView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class ReorderStopsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, trip_id):
+        trip = get_object_or_404(Trip, id=trip_id, user=request.user)
+        order_list = request.data.get('order', [])
+
+        stops_dict = {stop.id: stop for stop in trip.stops.all()}
+
+        for index, stop_id in enumerate(order_list):
+            if stop_id in stops_dict:
+                stop = stops_dict[stop_id]
+                stop.order = index
+                stop.save(update_fields=["order"])
+
+        return Response({"message": "Stops reordered"}, status=status.HTTP_200_OK)
+
+
+class DeleteStopView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def delete(self, request, stop_id):
+        stop = get_object_or_404(Stop, id=stop_id, trip__user=request.user)
+        stop.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
