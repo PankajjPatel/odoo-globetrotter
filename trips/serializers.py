@@ -1,2 +1,47 @@
 from rest_framework import serializers
 from .models import Trip, Stop, City, Activity, TripActivity
+
+
+class TripListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trip
+        fields = [
+            'id',
+            'name',
+            'start_date',
+            'end_date',
+            'cover_photo',
+            'is_public',
+            'created_at',
+        ]
+
+
+class TripCreateUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trip
+        fields = [
+            'id',
+            'name',
+            'description',
+            'start_date',
+            'end_date',
+            'cover_photo',
+            'is_public',
+        ]
+
+    def validate(self, attrs):
+        start_date = attrs.get('start_date')
+        end_date = attrs.get('end_date')
+
+        if self.instance:
+            if start_date is None:
+                start_date = self.instance.start_date
+            if end_date is None:
+                end_date = self.instance.end_date
+
+        if start_date and end_date and end_date < start_date:
+            raise serializers.ValidationError(
+                "End date must be greater than or equal to start date."
+            )
+
+        return attrs
