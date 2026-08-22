@@ -2,6 +2,27 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
+const apiFetch = async (endpoint, options = {}) => {
+  let res;
+  try {
+    res = await fetch(endpoint, options);
+    if (res.status === 502 || res.status === 504) {
+      const directUrl = `${API_BASE_URL}${endpoint}`;
+      res = await fetch(directUrl, options);
+    }
+  } catch (err) {
+    try {
+      const directUrl = `${API_BASE_URL}${endpoint}`;
+      res = await fetch(directUrl, options);
+    } catch (directErr) {
+      throw directErr;
+    }
+  }
+  return res;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
@@ -24,7 +45,7 @@ export const AuthProvider = ({ children }) => {
       const savedToken = localStorage.getItem('globetrotter_token');
       if (savedToken) {
         try {
-          const res = await fetch('/api/auth/me/', {
+          const res = await apiFetch('/api/auth/me/', {
             headers: {
               'Authorization': `Token ${savedToken}`,
               'Content-Type': 'application/json',
@@ -52,7 +73,7 @@ export const AuthProvider = ({ children }) => {
     let res;
     let data;
     try {
-      res = await fetch('/api/auth/signup/', {
+      res = await apiFetch('/api/auth/signup/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -68,9 +89,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     if (!res.ok) {
-      if (res.status >= 500 || !data || Object.keys(data).length === 0) {
-        throw new Error('Unable to connect to the backend server. Please make sure Django server is running.');
-      }
       let errorMessage = '';
       if (data.errors && typeof data.errors === 'object') {
         const errorEntries = Object.entries(data.errors);
@@ -79,8 +97,15 @@ export const AuthProvider = ({ children }) => {
           errorMessage = Array.isArray(msgs) ? msgs[0] : String(msgs);
         }
       }
+      if (!errorMessage && data.message) {
+        errorMessage = data.message;
+      }
       if (!errorMessage) {
-        errorMessage = data.message || 'Signup failed';
+        if (res.status >= 500 || !data || Object.keys(data).length === 0) {
+          errorMessage = 'Unable to connect to the backend server. Please make sure Django server is running.';
+        } else {
+          errorMessage = 'Signup failed';
+        }
       }
       throw new Error(errorMessage);
     }
@@ -99,7 +124,7 @@ export const AuthProvider = ({ children }) => {
     let res;
     let data;
     try {
-      res = await fetch('/api/auth/login/', {
+      res = await apiFetch('/api/auth/login/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -110,9 +135,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     if (!res.ok) {
-      if (res.status >= 500 || !data || Object.keys(data).length === 0) {
-        throw new Error('Unable to connect to the backend server. Please make sure Django server is running.');
-      }
       let errorMessage = '';
       if (data.errors && typeof data.errors === 'object') {
         const errorEntries = Object.entries(data.errors);
@@ -121,8 +143,15 @@ export const AuthProvider = ({ children }) => {
           errorMessage = Array.isArray(msgs) ? msgs[0] : String(msgs);
         }
       }
+      if (!errorMessage && data.message) {
+        errorMessage = data.message;
+      }
       if (!errorMessage) {
-        errorMessage = data.message || 'Invalid email or password';
+        if (res.status >= 500 || !data || Object.keys(data).length === 0) {
+          errorMessage = 'Unable to connect to the backend server. Please make sure Django server is running.';
+        } else {
+          errorMessage = 'Invalid email or password';
+        }
       }
       throw new Error(errorMessage);
     }
@@ -141,7 +170,7 @@ export const AuthProvider = ({ children }) => {
     let res;
     let data;
     try {
-      res = await fetch('/api/auth/forgot-password/', {
+      res = await apiFetch('/api/auth/forgot-password/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -156,9 +185,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     if (!res.ok) {
-      if (res.status >= 500 || !data || Object.keys(data).length === 0) {
-        throw new Error('Unable to connect to the backend server. Please make sure Django server is running.');
-      }
       let errorMessage = '';
       if (data.errors && typeof data.errors === 'object') {
         const errorEntries = Object.entries(data.errors);
@@ -167,8 +193,15 @@ export const AuthProvider = ({ children }) => {
           errorMessage = Array.isArray(msgs) ? msgs[0] : String(msgs);
         }
       }
+      if (!errorMessage && data.message) {
+        errorMessage = data.message;
+      }
       if (!errorMessage) {
-        errorMessage = data.message || 'Password reset failed';
+        if (res.status >= 500 || !data || Object.keys(data).length === 0) {
+          errorMessage = 'Unable to connect to the backend server. Please make sure Django server is running.';
+        } else {
+          errorMessage = 'Password reset failed';
+        }
       }
       throw new Error(errorMessage);
     }
@@ -185,7 +218,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (profileData) => {
     if (!token) throw new Error('Not authenticated.');
-    const res = await fetch('/api/auth/profile/', {
+    const res = await apiFetch('/api/auth/profile/', {
       method: 'PATCH',
       headers: {
         'Authorization': `Token ${token}`,
@@ -206,7 +239,7 @@ export const AuthProvider = ({ children }) => {
 
   const deleteAccount = async () => {
     if (!token) throw new Error('Not authenticated.');
-    const res = await fetch('/api/auth/delete-account/', {
+    const res = await apiFetch('/api/auth/delete-account/', {
       method: 'DELETE',
       headers: {
         'Authorization': `Token ${token}`,
@@ -224,7 +257,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       if (token) {
-        await fetch('/api/auth/logout/', {
+        await apiFetch('/api/auth/logout/', {
           method: 'POST',
           headers: {
             'Authorization': `Token ${token}`,
