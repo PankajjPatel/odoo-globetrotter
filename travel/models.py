@@ -15,15 +15,40 @@ class UserProfile(models.Model):
         return f"Profile of {self.user.username}"
 
 
+class AdminNotification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='admin_notifications')
+    notification_type = models.CharField(max_length=50, default='USER_SIGNUP')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Admin Notifications"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Notification: {self.message[:40]}"
+
+
 @receiver(post_save, sender=User)
 def create_or_save_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.get_or_create(user=instance)
+        # Create instant Admin Notification for new signups
+        full_name = f"{instance.first_name} {instance.last_name}".strip() or instance.username
+        joined_time = instance.date_joined.strftime('%b %d, %Y at %H:%M')
+        msg = f"New Traveler Registered: {full_name} (@{instance.username}) joined with email {instance.email} on {joined_time}."
+        AdminNotification.objects.create(
+            user=instance,
+            notification_type='USER_SIGNUP',
+            message=msg
+        )
     else:
         if hasattr(instance, 'profile'):
             instance.profile.save()
         else:
             UserProfile.objects.get_or_create(user=instance)
+
 
 
 class City(models.Model):

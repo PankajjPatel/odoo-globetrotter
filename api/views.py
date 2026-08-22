@@ -260,8 +260,13 @@ class AdminStatsView(APIView):
         total_trip_activities = TripActivity.objects.count()
         total_cities = City.objects.count()
 
+        # Daily and weekly new signups count
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        week_start = now - timedelta(days=7)
+        daily_signups = User.objects.filter(date_joined__gte=today_start).count()
+        weekly_signups = User.objects.filter(date_joined__gte=week_start).count()
+
         # Calculate monthly growth for last 5 months
-        now = timezone.now()
         user_growth = []
         for i in range(4, -1, -1):
             # Target month
@@ -304,12 +309,50 @@ class AdminStatsView(APIView):
                 "total_activities": total_activities,
                 "total_trip_activities": total_trip_activities,
                 "total_cities": total_cities,
+                "daily_signups": daily_signups,
+                "weekly_signups": weekly_signups,
             },
             "user_growth": user_growth,
             "popular_cities": popular_cities,
             "all_trips": trips_list,
             "all_activities": activities_list
         }, status=status.HTTP_200_OK)
+
+
+class AdminNotificationsListView(APIView):
+    permission_classes = [IsAdminUserPermission]
+
+    def get(self, request):
+        from travel.models import AdminNotification
+        notifications = AdminNotification.objects.select_related('user').all()[:100]
+        data = []
+        for n in notifications:
+            full_name = f"{n.user.first_name} {n.user.last_name}".strip() or n.user.username
+            data.append({
+                "id": n.id,
+                "user_id": n.user.id,
+                "username": n.user.username,
+                "full_name": full_name,
+                "email": n.user.email,
+                "message": n.message,
+                "notification_type": n.notification_type,
+                "is_read": n.is_read,
+                "created_at": n.created_at.strftime('%b %d, %Y at %H:%M')
+            })
+        return Response({
+            "notifications": data,
+            "unread_count": AdminNotification.objects.filter(is_read=False).count()
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        from travel.models import AdminNotification
+        notif_id = request.data.get('notification_id')
+        if notif_id:
+            AdminNotification.objects.filter(id=notif_id).update(is_read=True)
+        else:
+            AdminNotification.objects.all().update(is_read=True)
+        return Response({"message": "Notifications updated."}, status=status.HTTP_200_OK)
+
 
 
 class AdminUserListView(APIView):

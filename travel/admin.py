@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import City, Activity, UserProfile, SavedDestination
+from .models import City, Activity, UserProfile, SavedDestination, AdminNotification
 
 
 @admin.register(UserProfile)
@@ -7,6 +7,14 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'language_preference', 'profile_photo', 'created_at')
     search_fields = ('user__username', 'user__email', 'user__first_name', 'user__last_name')
     list_filter = ('language_preference', 'created_at')
+
+
+@admin.register(AdminNotification)
+class AdminNotificationAdmin(admin.ModelAdmin):
+    list_display = ('message', 'user', 'notification_type', 'is_read', 'created_at')
+    list_filter = ('is_read', 'notification_type', 'created_at')
+    search_fields = ('message', 'user__username', 'user__email')
+    readonly_fields = ('created_at',)
 
 
 @admin.register(City)
@@ -28,4 +36,5 @@ class SavedDestinationAdmin(admin.ModelAdmin):
     list_display = ('user', 'city', 'saved_at')
     search_fields = ('user__username', 'city__name')
     list_filter = ('saved_at',)
+
 
