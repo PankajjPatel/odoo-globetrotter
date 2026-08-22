@@ -100,6 +100,30 @@ class StopSerializer(serializers.ModelSerializer):
             'trip': {'write_only': True}
         }
 
+    def validate(self, attrs):
+        trip = attrs.get('trip')
+        start_date = attrs.get('start_date')
+        end_date = attrs.get('end_date')
+
+        if self.instance:
+            if not trip:
+                trip = self.instance.trip
+            if not start_date:
+                start_date = self.instance.start_date
+            if not end_date:
+                end_date = self.instance.end_date
+
+        if start_date and end_date and end_date < start_date:
+            raise serializers.ValidationError("Stop end date must be greater than or equal to start date.")
+
+        if trip:
+            if start_date and start_date < trip.start_date:
+                raise serializers.ValidationError("Stop start date must be within the trip dates.")
+            if end_date and end_date > trip.end_date:
+                raise serializers.ValidationError("Stop end date must be within the trip dates.")
+
+        return attrs
+
 
 
 class TripDetailSerializer(serializers.ModelSerializer):

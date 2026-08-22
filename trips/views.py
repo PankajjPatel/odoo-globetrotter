@@ -101,5 +101,73 @@ class ItineraryDetailView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class ShareTripView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, trip_id):
+        trip = get_object_or_404(Trip, id=trip_id, user=request.user)
+        return Response({
+            "share_uuid": trip.share_uuid,
+            "is_public": trip.is_public
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request, trip_id):
+        trip = get_object_or_404(Trip, id=trip_id, user=request.user)
+        is_public = request.data.get('is_public')
+        if is_public is not None:
+            trip.is_public = bool(is_public)
+            trip.save(update_fields=['is_public'])
+        return Response({
+            "share_uuid": trip.share_uuid,
+            "is_public": trip.is_public
+        }, status=status.HTTP_200_OK)
+
+
+class SharedTripDetailView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, share_uuid):
+        trip = get_object_or_404(Trip, share_uuid=share_uuid)
+        serializer = TripDetailSerializer(trip)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class CopySharedTripView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, share_uuid):
+        original_trip = get_object_or_404(Trip, share_uuid=share_uuid)
+
+        new_trip = Trip.objects.create(
+            user=request.user,
+            name=original_trip.name,
+            description=original_trip.description,
+            start_date=original_trip.start_date,
+            end_date=original_trip.end_date,
+            cover_photo=original_trip.cover_photo,
+            is_public=False
+        )
+
+        for stop in original_trip.stops.all():
+            new_stop = Stop.objects.create(
+                trip=new_trip,
+                city=stop.city,
+                start_date=stop.start_date,
+                end_date=stop.end_date,
+                order=stop.order
+            )
+            for trip_activity in stop.trip_activities.all():
+                TripActivity.objects.create(
+                    stop=new_stop,
+                    activity=trip_activity.activity,
+                    scheduled_time=trip_activity.scheduled_time,
+                    cost_override=trip_activity.cost_override
+                )
+
+        serializer = TripDetailSerializer(new_trip)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
 
 

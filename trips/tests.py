@@ -351,4 +351,103 @@ class TripAPIViewSetTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_stop_date_range_validation(self):
+        self.client.force_authenticate(user=self.user1)
+        
+        # Test 1: Start date before trip start date
+        url = reverse('add-stop', kwargs={'trip_id': self.trip1.id})
+        data = {
+            'city': self.city1.id,
+            'start_date': str(self.trip1.start_date - timedelta(days=1)),
+            'end_date': str(self.trip1.end_date)
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Stop start date must be within the trip dates.", str(response.data))
+
+        # Test 2: End date after trip end date
+        data = {
+            'city': self.city1.id,
+            'start_date': str(self.trip1.start_date),
+            'end_date': str(self.trip1.end_date + timedelta(days=1))
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Stop end date must be within the trip dates.", str(response.data))
+
+        # Test 3: End date before start date
+        data = {
+            'city': self.city1.id,
+            'start_date': str(self.trip1.start_date + timedelta(days=2)),
+            'end_date': str(self.trip1.start_date + timedelta(days=1))
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Stop end date must be greater than or equal to start date.", str(response.data))
+
+    def test_share_trip_get_and_post(self):
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('share-trip', kwargs={'trip_id': self.trip1.id})
+        
+        # Test GET
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('share_uuid', response.data)
+        self.assertEqual(response.data['is_public'], False)
+
+        # Test POST (Toggle to public)
+        response = self.client.post(url, {'is_public': True}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['is_public'], True)
+
+        self.trip1.refresh_from_db()
+        self.assertEqual(self.trip1.is_public, True)
+
+    def test_shared_trip_detail_public(self):
+        # No authentication
+        url = reverse('shared-trip-detail', kwargs={'share_uuid': self.trip1.share_uuid})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], self.trip1.id)
+        self.assertEqual(response.data['name'], self.trip1.name)
+
+    def test_copy_shared_trip(self):
+        # Setup stops and activities on original trip
+        stop = Stop.objects.create(
+            trip=self.trip1,
+            city=self.city1,
+            start_date=self.trip1.start_date,
+            end_date=self.trip1.start_date + timedelta(days=1),
+            order=0
+        )
+        TripActivity.objects.create(
+            stop=stop,
+            activity=self.activity1,
+            cost_override=15.00
+        )
+
+        # Authenticate as user2 (different user)
+        self.client.force_authenticate(user=self.user2)
+        url = reverse('copy-shared-trip', kwargs={'share_uuid': self.trip1.share_uuid})
+        response = self.client.post(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_trip_id = response.data['id']
+        self.assertNotEqual(new_trip_id, self.trip1.id)
+        
+        # Verify ownership is user2
+        new_trip = Trip.objects.get(id=new_trip_id)
+        self.assertEqual(new_trip.user, self.user2)
+        self.assertEqual(new_trip.name, self.trip1.name)
+        
+        # Verify stops and activities were copied
+        self.assertEqual(new_trip.stops.count(), 1)
+        copied_stop = new_trip.stops.first()
+        self.assertEqual(copied_stop.city, self.city1)
+        self.assertEqual(copied_stop.trip_activities.count(), 1)
+        copied_activity = copied_stop.trip_activities.first()
+        self.assertEqual(copied_activity.activity, self.activity1)
+        self.assertEqual(float(copied_activity.cost_override), 15.00)
+
+
 
