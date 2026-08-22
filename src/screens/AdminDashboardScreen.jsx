@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { 
@@ -60,13 +59,13 @@ const DEFAULT_INITIAL_STATS = {
 };
 
 const DEFAULT_POPULAR_CITIES = [
-  { name: 'Goa', country: 'India', cost_index: '₹18,000 / trip', popularity: 'Very High' },
-  { name: 'Jaipur', country: 'India', cost_index: '₹12,000 / trip', popularity: 'Very High' },
-  { name: 'Udaipur', country: 'India', cost_index: '₹22,000 / trip', popularity: 'High' },
-  { name: 'Agra', country: 'India', cost_index: '₹8,500 / trip', popularity: 'Very High' },
-  { name: 'Delhi', country: 'India', cost_index: '₹10,000 / trip', popularity: 'Very High' },
-  { name: 'Manali', country: 'India', cost_index: '₹16,000 / trip', popularity: 'High' },
-  { name: 'Varanasi', country: 'India', cost_index: '₹6,500 / trip', popularity: 'High' },
+  { name: 'Goa', country: 'India', cost_index: '$$$', popularity: 'Very High' },
+  { name: 'Jaipur', country: 'India', cost_index: '$$', popularity: 'Very High' },
+  { name: 'Udaipur', country: 'India', cost_index: '$$$', popularity: 'High' },
+  { name: 'Agra', country: 'India', cost_index: '$$', popularity: 'Very High' },
+  { name: 'Delhi', country: 'India', cost_index: '$$', popularity: 'Very High' },
+  { name: 'Manali', country: 'India', cost_index: '$$', popularity: 'High' },
+  { name: 'Varanasi', country: 'India', cost_index: '$', popularity: 'High' },
 ];
 
 const DEFAULT_GROWTH = [
@@ -78,6 +77,28 @@ const DEFAULT_GROWTH = [
   { month: 'Aug', users: 118 },
 ];
 
+const DEFAULT_INITIAL_TRIPS = [
+  { id: 1, name: 'Golden Triangle & Goa Getaway', user_name: 'Pankaj Admin', start_date: 'Sep 01, 2026', end_date: 'Sep 08, 2026', stops_count: 2, is_public: true },
+  { id: 2, name: 'Exploring Vibrant Heritage - Aarav', user_name: 'Aarav Sharma', start_date: 'Sep 12, 2026', end_date: 'Sep 20, 2026', stops_count: 3, is_public: true },
+  { id: 3, name: 'Coastal Paradise Getaway - Diya', user_name: 'Diya Patel', start_date: 'Sep 15, 2026', end_date: 'Sep 22, 2026', stops_count: 2, is_public: true },
+  { id: 4, name: 'Himalayan Escape - Ananya', user_name: 'Ananya Verma', start_date: 'Sep 18, 2026', end_date: 'Sep 26, 2026', stops_count: 4, is_public: true },
+  { id: 5, name: 'Monsoon Trail - Rohan', user_name: 'Rohan Mehta', start_date: 'Sep 25, 2026', end_date: 'Oct 02, 2026', stops_count: 2, is_public: true },
+  { id: 6, name: 'Desert Safari Adventure - Vikram', user_name: 'Vikram Singh', start_date: 'Oct 05, 2026', end_date: 'Oct 12, 2026', stops_count: 3, is_public: true },
+  { id: 7, name: 'Southern Temple Odyssey - Priya', user_name: 'Priya Nair', start_date: 'Oct 10, 2026', end_date: 'Oct 18, 2026', stops_count: 2, is_public: true },
+  { id: 8, name: 'Palaces of Rajasthan - Kabir', user_name: 'Kabir Joshi', start_date: 'Oct 15, 2026', end_date: 'Oct 24, 2026', stops_count: 3, is_public: true },
+];
+
+const DEFAULT_INITIAL_ACTIVITIES = [
+  { id: 1, name: 'Taj Mahal Sunrise Tour', type: 'Sightseeing', cost: '50.00', duration_hours: 3 },
+  { id: 2, name: 'Amber Fort Elephant & Jeep Ride', type: 'History', cost: '35.00', duration_hours: 3 },
+  { id: 3, name: 'Baga Beach Watersports Combo', type: 'Adventure', cost: '40.00', duration_hours: 4 },
+  { id: 4, name: 'Lake Pichola Sunset Boat Cruise', type: 'Sightseeing', cost: '25.00', duration_hours: 2 },
+  { id: 5, name: 'Solang Valley Paragliding Experience', type: 'Adventure', cost: '45.00', duration_hours: 3 },
+  { id: 6, name: 'Dashashwamedh Ghat Ganga Aarti', type: 'Culture', cost: '0.00', duration_hours: 2 },
+  { id: 7, name: 'Qutub Minar Architectural Walk', type: 'History', cost: '15.00', duration_hours: 2 },
+  { id: 8, name: 'Gateway of India & Elephanta Caves', type: 'Sightseeing', cost: '30.00', duration_hours: 4 },
+];
+
 export const AdminDashboardScreen = () => {
   const { token, user: currentUser } = useAuth();
   
@@ -85,11 +106,17 @@ export const AdminDashboardScreen = () => {
   const [userGrowth, setUserGrowth] = useState(DEFAULT_GROWTH);
   const [popularCities, setPopularCities] = useState(DEFAULT_POPULAR_CITIES);
   const [users, setUsers] = useState(DEFAULT_INITIAL_USERS);
+  const [allTrips, setAllTrips] = useState(DEFAULT_INITIAL_TRIPS);
+  const [allActivities, setAllActivities] = useState(DEFAULT_INITIAL_ACTIVITIES);
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [selectedUserDetail, setSelectedUserDetail] = useState(null);
+  const [activeKpiModal, setActiveKpiModal] = useState(null); // 'users' | 'trips' | 'destinations' | 'activities'
+  const [kpiModalSearch, setKpiModalSearch] = useState('');
 
   const fetchAdminData = async () => {
     const authToken = token || localStorage.getItem('globetrotter_token');
@@ -114,6 +141,8 @@ export const AdminDashboardScreen = () => {
         setStats(statsData.stats);
         setUserGrowth(statsData.user_growth || []);
         setPopularCities(statsData.popular_cities || []);
+        if (statsData.all_trips && statsData.all_trips.length > 0) setAllTrips(statsData.all_trips);
+        if (statsData.all_activities && statsData.all_activities.length > 0) setAllActivities(statsData.all_activities);
       }
 
       if (usersRes.ok) {
@@ -143,7 +172,7 @@ export const AdminDashboardScreen = () => {
         setFeedback({ type: 'success', message: data.message });
         setUsers(prev => prev.map(u => u.id === user.id ? { ...u, is_active: data.is_active } : u));
       } else {
-        setFeedback({ type: 'error', message: data.message || 'Status toggle failed.' });
+        setFeedback({ type: 'error', message: data.message || 'Failed to update user status.' });
       }
     } catch {
       setFeedback({ type: 'error', message: 'Action failed. Please try again.' });
@@ -190,63 +219,52 @@ export const AdminDashboardScreen = () => {
         setFeedback({ type: 'error', message: data.message || 'Failed to delete user.' });
       }
     } catch {
-      setFeedback({ type: 'error', message: 'An unexpected error occurred while deleting user.' });
+      setFeedback({ type: 'error', message: 'Action failed. Please try again.' });
     } finally {
       setActionLoading(false);
-      setUserToDelete(null);
     }
-  };
-
-  const handleKpiCardClick = (type) => {
-    if (type === 'users') {
-      document.getElementById('user-directory-section')?.scrollIntoView({ behavior: 'smooth' });
-    } else if (type === 'trips') {
-      navigate('/my-trips');
-    } else if (type === 'stops' || type === 'activities') {
-      navigate('/search/city');
-    }
-  };
-
-  const handleCityCardClick = (cityName) => {
-    navigate('/search/city', { state: { initialSearch: cityName } });
   };
 
   const statCards = [
     {
       type: 'users',
       title: 'Total Users',
-      value: stats ? stats.total_users : '...',
-      label: 'Registered accounts (Click to view)',
+      value: stats ? stats.total_users : '118',
+      label: 'Registered accounts',
       icon: Users,
       color: '#3b82f6',
-      gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+      subtext: 'Click to view all users'
     },
     {
       type: 'trips',
       title: 'Active Trips',
-      value: stats ? stats.total_trips : '...',
-      label: 'Custom itineraries (Click to explore)',
+      value: stats ? stats.total_trips : '67',
+      label: 'Custom itineraries',
       icon: Compass,
       color: '#f97316',
-      gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
+      gradient: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+      subtext: 'Click to view all itineraries'
     },
     {
-      type: 'stops',
+      type: 'destinations',
       title: 'Destinations & Stops',
-      value: stats ? stats.total_stops : '...',
-      label: 'Planned city stops (Click to search)',
+      value: stats ? stats.total_stops : '94',
+      label: 'Planned city stops',
       icon: MapPin,
       color: '#10b981',
-      gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)'
+      gradient: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
+      subtext: 'Click to view all destinations'
     },
     {
       type: 'activities',
       title: 'Activities Booked',
-      value: stats ? (stats.total_trip_activities || stats.total_activities) : '...',
-      label: 'Selected experiences (Click to view)',
+      value: stats ? (stats.total_trip_activities || stats.total_activities) : '48',
+      label: 'Selected experiences',
       icon: Activity,
       color: '#8b5cf6',
-      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)'
+      gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+      subtext: 'Click to view all activities'
     }
   ];
 
@@ -282,14 +300,17 @@ export const AdminDashboardScreen = () => {
         </div>
       )}
 
-      {/* KPI Stats Grid */}
+      {/* KPI Stats Grid - All Clickable */}
       <div className="admin-kpi-grid">
         {statCards.map((item, idx) => (
           <Card 
             key={idx} 
-            className="kpi-card glass hoverable clickable-kpi-card"
-            onClick={() => handleKpiCardClick(item.type)}
-            title={`Click to view ${item.title}`}
+            className="kpi-card kpi-card-clickable glass"
+            onClick={() => {
+              setKpiModalSearch('');
+              setActiveKpiModal(item.type);
+            }}
+            title={`${item.title} — ${item.subtext}`}
           >
             <div className="kpi-card-header">
               <div className="kpi-icon-box" style={{ background: item.gradient }}>
@@ -300,6 +321,10 @@ export const AdminDashboardScreen = () => {
             <div className="kpi-body">
               <div className="kpi-value">{item.value}</div>
               <div className="kpi-label">{item.label}</div>
+            </div>
+            <div className="kpi-card-footer">
+              <span>{item.subtext}</span>
+              <span className="kpi-arrow-icon">→</span>
             </div>
           </Card>
         ))}
@@ -352,25 +377,20 @@ export const AdminDashboardScreen = () => {
               <Globe size={20} className="text-primary-brand" />
               <div>
                 <h2>Top Destinations</h2>
-                <p className="card-subtext">Click any city to view & plan</p>
+                <p className="card-subtext">Popular verified travel hubs</p>
               </div>
             </div>
           </div>
           <div className="destination-chips-list">
             {popularCities.length > 0 ? (
               popularCities.map((city, idx) => (
-                <div 
-                  key={idx} 
-                  className="destination-chip clickable-chip hoverable"
-                  onClick={() => handleCityCardClick(city.name)}
-                  title={`Click to explore ${city.name}`}
-                >
+                <div key={idx} className="destination-chip">
                   <div className="chip-icon"><MapPin size={16} /></div>
                   <div className="chip-info">
                     <span className="chip-name">{city.name}</span>
                     <span className="chip-country">{city.country} • {city.popularity}</span>
                   </div>
-                  <span className="chip-cost-inr">{city.cost_index}</span>
+                  <span className="chip-cost">{city.cost_index}</span>
                 </div>
               ))
             ) : (
@@ -381,7 +401,7 @@ export const AdminDashboardScreen = () => {
       </div>
 
       {/* User Management Section */}
-      <Card id="user-directory-section" className="user-management-card glass">
+      <Card className="user-management-card glass">
         <div className="user-management-header">
           <div className="section-title-wrapper">
             <Database size={22} className="text-primary-brand" />
@@ -520,6 +540,127 @@ export const AdminDashboardScreen = () => {
           </table>
         </div>
       </Card>
+
+      {/* KPI Detail Inspection Modal (Users / Trips / Destinations / Activities) */}
+      {activeKpiModal && (
+        <div className="admin-modal-overlay animate-fade-in" onClick={() => setActiveKpiModal(null)}>
+          <div className="admin-modal-card kpi-detail-modal-card glass" onClick={(e) => e.stopPropagation()}>
+            <div className="user-modal-header">
+              <div className="kpi-modal-icon-badge">
+                {activeKpiModal === 'users' && <Users size={24} />}
+                {activeKpiModal === 'trips' && <Compass size={24} />}
+                {activeKpiModal === 'destinations' && <MapPin size={24} />}
+                {activeKpiModal === 'activities' && <Activity size={24} />}
+              </div>
+              <div className="user-modal-title-box">
+                <h3>
+                  {activeKpiModal === 'users' && `Registered Explorers & Admins (${users.length})`}
+                  {activeKpiModal === 'trips' && `Active Itineraries & Trips (${allTrips.length})`}
+                  {activeKpiModal === 'destinations' && `Curated Destinations (${popularCities.length})`}
+                  {activeKpiModal === 'activities' && `Catalog Experiences & Activities (${allActivities.length})`}
+                </h3>
+                <p className="user-modal-handle">Live database records and detailed category catalog.</p>
+              </div>
+              <button className="modal-close-btn" onClick={() => setActiveKpiModal(null)}>×</button>
+            </div>
+
+            <div className="kpi-modal-search-box">
+              <Search size={16} className="search-icon-inside" />
+              <input 
+                type="text" 
+                placeholder={`Search ${activeKpiModal}...`}
+                value={kpiModalSearch}
+                onChange={(e) => setKpiModalSearch(e.target.value)}
+                className="kpi-search-input"
+              />
+            </div>
+
+            <div className="kpi-modal-content-list no-scrollbar">
+              {/* Users Modal List */}
+              {activeKpiModal === 'users' && (
+                <div className="kpi-items-column">
+                  {users
+                    .filter(u => u.full_name.toLowerCase().includes(kpiModalSearch.toLowerCase()) || u.email.toLowerCase().includes(kpiModalSearch.toLowerCase()) || u.username.toLowerCase().includes(kpiModalSearch.toLowerCase()))
+                    .map(u => (
+                      <div key={u.id} className="kpi-item-row" onClick={() => { setActiveKpiModal(null); setSelectedUserDetail(u); }}>
+                        <div className="user-avatar-sm">
+                          {u.full_name.charAt(0).toUpperCase() || u.username.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1">
+                          <div className="kpi-row-main-text">{u.full_name} <span className="text-secondary font-sm">(@{u.username})</span></div>
+                          <div className="kpi-row-sub-text">{u.email} • {u.date_joined}</div>
+                        </div>
+                        <span className="trips-count-pill">{u.trips_count} {u.trips_count === 1 ? 'trip' : 'trips'}</span>
+                        <Button variant="ghost" size="sm" className="btn-action-inspect ml-2">Inspect</Button>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {/* Trips Modal List */}
+              {activeKpiModal === 'trips' && (
+                <div className="kpi-items-column">
+                  {allTrips
+                    .filter(t => t.name.toLowerCase().includes(kpiModalSearch.toLowerCase()) || t.user_name.toLowerCase().includes(kpiModalSearch.toLowerCase()))
+                    .map(t => (
+                      <div key={t.id} className="kpi-item-row">
+                        <div className="trip-icon-box-sm"><Compass size={18} /></div>
+                        <div className="flex-1">
+                          <div className="kpi-row-main-text">{t.name}</div>
+                          <div className="kpi-row-sub-text">Created by {t.user_name} • {t.start_date} - {t.end_date}</div>
+                        </div>
+                        <span className="trips-count-pill">{t.stops_count} stops</span>
+                        <span className="badge-role traveler ml-2">{t.is_public ? 'Public' : 'Private'}</span>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {/* Destinations Modal List */}
+              {activeKpiModal === 'destinations' && (
+                <div className="kpi-items-grid">
+                  {popularCities
+                    .filter(c => c.name.toLowerCase().includes(kpiModalSearch.toLowerCase()) || c.country.toLowerCase().includes(kpiModalSearch.toLowerCase()))
+                    .map((c, i) => (
+                      <div key={i} className="destination-chip kpi-dest-card">
+                        <div className="chip-icon"><MapPin size={18} /></div>
+                        <div className="chip-info">
+                          <span className="chip-name">{c.name}</span>
+                          <span className="chip-country">{c.country} • Popularity: {c.popularity}</span>
+                        </div>
+                        <span className="chip-cost">{c.cost_index}</span>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {/* Activities Modal List */}
+              {activeKpiModal === 'activities' && (
+                <div className="kpi-items-grid">
+                  {allActivities
+                    .filter(a => a.name.toLowerCase().includes(kpiModalSearch.toLowerCase()) || a.type.toLowerCase().includes(kpiModalSearch.toLowerCase()))
+                    .map((a) => (
+                      <div key={a.id} className="activity-kpi-card">
+                        <div className="activity-card-top">
+                          <span className="activity-type-badge">{a.type}</span>
+                          <span className="activity-cost-tag">₹{a.cost || 'Free'}</span>
+                        </div>
+                        <div className="activity-name-text">{a.name}</div>
+                        <div className="activity-duration-sub">Duration: ~{a.duration_hours || 2} hours</div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            <div className="modal-footer-row">
+              <Button variant="primary" onClick={() => setActiveKpiModal(null)}>
+                Close Window
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* User Details & Trips Inspection Modal */}
       {selectedUserDetail && (

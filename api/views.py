@@ -197,7 +197,25 @@ class AdminStatsView(APIView):
             })
 
         # Recent activities/popular cities
-        popular_cities = list(City.objects.values('name', 'country', 'cost_index', 'popularity')[:5])
+        popular_cities = list(City.objects.values('name', 'country', 'cost_index', 'popularity')[:10])
+
+        # All trips overview
+        trips_list = []
+        for t in Trip.objects.select_related('user').all()[:40]:
+            stops_c = t.stops.count() if hasattr(t, 'stops') else 0
+            u_name = f"{t.user.first_name} {t.user.last_name}".strip() if t.user else "Explorer"
+            trips_list.append({
+                "id": t.id,
+                "name": t.name,
+                "user_name": u_name or t.user.username,
+                "start_date": t.start_date.strftime('%b %d, %Y') if t.start_date else 'TBD',
+                "end_date": t.end_date.strftime('%b %d, %Y') if t.end_date else 'TBD',
+                "stops_count": stops_c,
+                "is_public": t.is_public
+            })
+
+        # All activities overview
+        activities_list = list(Activity.objects.values('id', 'name', 'type', 'cost', 'duration_hours')[:40])
 
         return Response({
             "stats": {
@@ -209,7 +227,9 @@ class AdminStatsView(APIView):
                 "total_cities": total_cities,
             },
             "user_growth": user_growth,
-            "popular_cities": popular_cities
+            "popular_cities": popular_cities,
+            "all_trips": trips_list,
+            "all_activities": activities_list
         }, status=status.HTTP_200_OK)
 
 
